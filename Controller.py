@@ -1,5 +1,4 @@
-import paho.mqtt.client as mqtt
-from GUIController import GUIController
+import paho-mqtt.client as mqtt
 from DataManager import DataManager
 
 
