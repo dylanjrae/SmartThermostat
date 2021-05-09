@@ -12,7 +12,7 @@
 #ifndef STASSID
 #define STASSID "NUTHOUSE_2.4"
 #define STAPSK  "pmwpmwpmw"
-#define MQTTHOST "broker.emqx.io"
+#define MQTTHOST "10.0.0.69"
 #define MQTTPORT 1883
 #endif
 
