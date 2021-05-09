@@ -1,4 +1,4 @@
-import paho-mqtt.client as mqtt
+import paho.mqtt.client as mqtt
 from DataManager import DataManager
 
 
@@ -14,7 +14,7 @@ class Controller:
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         
-        print("Attempting to conneconnected to mqtt server...")
+        print("Attempting to connect to mqtt server...")
         self.client.connect(self.host, port=1883)
         self.client.loop_start()
 
