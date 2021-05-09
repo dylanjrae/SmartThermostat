@@ -1,17 +1,12 @@
-print("Hello World")
-
-
-# connect to SQL database
-# connect to MQTT broker
-# if a message on currentTemp is recieved, save it
-# take saved message and write into sql table (maye some way to optimize would be to only write when it has 10 saved?)
-
-import paho-mqtt.client as mqtt
+import paho.mqtt.client as mqtt
+from GUIController import GUIController
+from DataManager import DataManager
 
 
 class Controller:
     def __init__(self, host):
         self.host = host
+        self.dataManager = DataManager()
         
        
         
@@ -67,5 +62,7 @@ class Controller:
 control = Controller("10.0.0.69")
 print("Welcome to the NutHouse Thermostat Server!")
 control.start_connection()
+    
+    
     
     
