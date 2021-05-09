@@ -6,7 +6,7 @@ print("Hello World")
 # if a message on currentTemp is recieved, save it
 # take saved message and write into sql table (maye some way to optimize would be to only write when it has 10 saved?)
 
-import paho.mqtt.client as mqtt
+import paho-mqtt.client as mqtt
 
 
 class Controller:
@@ -64,7 +64,8 @@ class Controller:
             + message.topic + "' with QoS " + str(message.qos))
         
 
-control = Controller("127.0.0.1")
-# control.GUIController.mainMenu()
+control = Controller("10.0.0.69")
+print("Welcome to the NutHouse Thermostat Server!")
+control.start_connection()
     
     
