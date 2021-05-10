@@ -1,11 +1,13 @@
 import paho.mqtt.client as mqtt
+from GUIController import GUIController
 from DataManager import DataManager
 
 
 class Controller:
     def __init__(self, host):
         self.host = host
-        self.dataManager = DataManager()
+        self.GUIController = GUIController(self)
+        self.dataManager = DataManager();
         
        
         
@@ -14,7 +16,7 @@ class Controller:
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         
-        print("Attempting to connect to mqtt server...")
+        print("Attempting to conneconnected to mqtt server...")
         self.client.connect(self.host, port=1883)
         self.client.loop_start()
 
@@ -58,6 +60,11 @@ class Controller:
             + message.topic + "' with QoS " + str(message.qos))
         
 
+
+
 control = Controller("10.0.0.69")
-print("Welcome to the NutHouse Thermostat Server!")
-control.start_connection()
+control.GUIController.mainMenu()
+    
+    
+    
+    
