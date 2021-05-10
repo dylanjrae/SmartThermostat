@@ -1,12 +1,19 @@
 import paho.mqtt.client as mqtt
 
 from DataManager import DataManager
+import mysql.connector
+from datetime import datetime
 
 
 class Controller:
+        
     def __init__(self, host):
         self.host = host
         self.dataManager = DataManager()
+        print("Success1")
+        self.mydb = mysql.connector.connect(host='10.0.0.69',user='root',port='3306', password='pmwpmwpmw',database='tempLog')
+        print("Success2")
+        self.mycursor = self.mydb.cursor()
         
     def start_connection(self):
         self.client = mqtt.Client(client_id="Python_DashBoard", clean_session=True, userdata=None, transport="tcp")
@@ -41,7 +48,7 @@ class Controller:
         
         if message.topic == "therm/CURRENTTEMP":
             self.dataManager.currentTemps.append(float(message.payload))
-            writeToSQL("tempReadings", float(message.payload))
+            self.writeToSQL("tempReadings", float(message.payload))
             
             #Need to record time of each temp
         elif message.topic == "therm/STATUS":
@@ -51,23 +58,37 @@ class Controller:
             self.dataManager.mains.append(str(message.payload))
             
         elif message.topic == "therm/OVERRIDE":
-            self.dataManager.override.append((str(message.payload)))
             
             print("Received message '" + str(message.payload) + "' on topic '"
             + message.topic + "' with QoS " + str(message.qos))
             
-    def writeToSQL(table, data):
+    def writeToSQL(self, table, data):
         #this function takes a table name and saves the data and the current date and time into the table
         
         #when a controller is made a cursor should be set up that connects and points to the sql database
         #then use that cursor in this function as the writing location
         #will likely need pyodbc(to connect to SQL server), and JinjaSQL or some sort of sql library,
         #and will poboably need a date/time library to get current time
-        
+        now = datetime.now()
+
+        date= now.strftime("%m/%d/%Y")
+        print("date:",date)
+
+        time = now.strftime("%H:%M:%S")
+        print("time:",time)
+
+        sql = "INSERT INTO Temperature_Log (date, time, temperature) VALUES (%s, %s, %s)"
+        val = (date, time, data)
+
+        self.mycursor.execute(sql, val)
+
+        self.mydb.commit()
+
+        print(self.mycursor.rowcount, "record inserted.")
+  
+        return 
 
 control = Controller("10.0.0.69")
 print("Welcome to the NutHouse Thermostat Server!")
 control.start_connection()
 control.client.loop_forever()
-
-
