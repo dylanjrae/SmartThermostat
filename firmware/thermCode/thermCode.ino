@@ -46,9 +46,6 @@ int hour;
 
 float setTemp = 24;
 float currentTemp=0;
-float currentTemp1=0;
-float currentTemp2=0;
-float aveTemp=0;
 
 volatile unsigned int pulseCount = 0;
 
@@ -59,7 +56,6 @@ NTPClient timeClient(ntpUDP, "north-america.pool.ntp.org", utcOffsetInSeconds);
 
 WiFiClient espClient;
 PubSubClient client(espClient);
-
 
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -144,7 +140,7 @@ void connectMQTT() {
       Serial.println(client.state());
       delay(2000);
     }
-    //while trying to connec tto mqrtt do the following tasks
+    //while trying to connec tto mqtt do the following tasks
       recordTemp();
       checkTemp();
       ArduinoOTA.handle();
@@ -172,7 +168,7 @@ void startWebServer() {
 }
 
 void handleRoot() {
-  server.send(200, "text/html", "<form action=\"/SetTemp\" method=\"POST\"><p>Welcome to the <b>NutHouse</b> Thermostat :)</p><img src=\"https://canadiantire.scene7.com/is/image/CanadianTire/1753194_1?defaultImage=image_na_EN&imageSet=CanadianTire/1753194_1?defaultImage=image_na_EN&id=-lir53&fmt=jpg&fit=constrain,1&wid=339&hei=200\" alt=\"NUTTT\"><p>The current room temperature is: <b>" + String(aveTemp) + "</b> degrees C</p><p>The current set temperature is: <b>" + String(setTemp) + "</b> degrees C</p> <p>Furnace on? (it's a boolean): " + String(heating) + "</p><input type=\"text\" name=\"setTemp\" placeholder=\"Enter new set temp\"></br></br><input type=\"submit\" value=\"Set Now!\"></form>");
+  server.send(200, "text/html", "<form action=\"/SetTemp\" method=\"POST\"><p>Welcome to the <b>NutHouse</b> Thermostat :)</p><img src=\"https://canadiantire.scene7.com/is/image/CanadianTire/1753194_1?defaultImage=image_na_EN&imageSet=CanadianTire/1753194_1?defaultImage=image_na_EN&id=-lir53&fmt=jpg&fit=constrain,1&wid=339&hei=200\" alt=\"NUTTT\"><p>The current room temperature is: <b>" + String(currentTemp) + "</b> degrees C</p><p>The current set temperature is: <b>" + String(setTemp) + "</b> degrees C</p> <p>Furnace on? (it's a boolean): " + String(heating) + "</p><input type=\"text\" name=\"setTemp\" placeholder=\"Enter new set temp\"></br></br><input type=\"submit\" value=\"Set Now!\"></form>");
 }
 
 void handleNotFound(){
@@ -264,10 +260,7 @@ void checkSchedule() {
 }
 
 void recordTemp() {
-  currentTemp2 = currentTemp1;
-  currentTemp1 = currentTemp;
   currentTemp = getTemp();
-  aveTemp = (currentTemp + currentTemp1 + currentTemp2)/3;
 }
 
 void setNewTemp(float newTemp) {
@@ -284,15 +277,15 @@ void setNewTemp(float newTemp) {
 //when called prints the average of the last x readings
 void printTemp() {
   Serial.print("The current room temperature is: ");
-  Serial.print(aveTemp);
+  Serial.print(currentTemp);
   Serial.println(" degress C");
   Serial.print("The current set temperature is: ");
   Serial.print(setTemp);
   Serial.println(" degress C");
   //print to MQTT
   
-  //String toSend = "The current temperature is: " + String(aveTemp) + " degrees C.";
-  String toSend = String(aveTemp);
+  //String toSend = "The current temperature is: " + String(currentTemp) + " degrees C.";
+  String toSend = String(currentTemp);
   const char* toSendChar = toSend.c_str();
   client.publish("therm/CURRENTTEMP", toSendChar);
 }
@@ -304,12 +297,12 @@ void checkTemp() {
     return;
   }
   
-  if (aveTemp < setTemp-1.00) {
+  if (currentTemp < setTemp-1.00) {
     //digitalWrite(led, HIGH); //Turn on LED
     digitalWrite(ssr, HIGH);//turn on ssr
     heating = true;
   }
-  else if (aveTemp > setTemp+1.00) {
+  else if (currentTemp > setTemp+1.00) {
     //digitalWrite(led, LOW); //turn off LED
     digitalWrite(ssr, LOW); //turn off ssr
     heating=false;
@@ -409,18 +402,20 @@ void loop() {
   checkTemp();
   printTemp();
   checkSchedule();
-  String toSend = "The current hour is: " + String(hour);
-  const char* toSendChar = toSend.c_str();
-  client.publish("therm/main", toSendChar);
+//  String toSend = "The current hour is: " + String(hour);
+//  const char* toSendChar = toSend.c_str();
+//  client.publish("therm/main", toSendChar);
 
   //could write temp schedukle into flash so it is still there when it boots up after deep sleep
   //Serial.println("The current hour is: " + String(hour));
-  
+  Serial.println("before therm/FURNACE, and heating is:" + String(heating));
   if(heating) {
-    client.publish("therm/main", "Currently heating");
+    client.publish("therm/FURNACE", "1");
+    Serial.println("Insisde if therm/FURNACE, and heating is:" + String(heating));
   }
   else {
-    client.publish("therm/main", "Furnace OFF");
+    client.publish("therm/FURNACE", "0");
+    Serial.println("Inside else therm/FURNACE, and heating is:" + String(heating));
   }
 
   //should make a message board everyone can post to
