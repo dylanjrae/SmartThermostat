@@ -36,6 +36,7 @@ class Controller:
         client.subscribe("therm/OVERRIDE", qos=0)
         client.subscribe("therm/CURRENTTEMP", qos=0)
         client.subscribe("therm/STATUS", qos=0)
+        client.subscribe("therm/FURNACE", qos=0)
         
     
     # The callback for when a PUBLISH message is received from the server.
@@ -49,13 +50,16 @@ class Controller:
             self.dataManager.currentTemps.append(float(message.payload))
             self.writeToSQL("temp", float(message.payload))
             
+        if message.topic == "therm/FURNACE":
+            self.dataManager.currentTemps.append(float(message.payload))
+            self.writeToSQL("status", str(message.payload))
+            
             #Need to record time of each temp
         elif message.topic == "therm/STATUS":
             self.dataManager.status.append(str(message.payload))
 
         elif message.topic == "therm/main":
             self.dataManager.mains.append(str(message.payload))
-            self.writeToSQL("status", str(message.payload))
 
         elif message.topic == "therm/OVERRIDE":
             
@@ -63,17 +67,15 @@ class Controller:
             + message.topic + "' with QoS " + str(message.qos))
             
     def writeToSQL(self, table, data):
-        
         date, time = self.getDateTime()
 
         if table == "temp":
             sql = "INSERT INTO Temperature_Log_Test (date, time, temperature, weatherTemp) VALUES (%s, %s, %s, %s)"
             val = (date, time, data, self.getWeatherTemp("Calgary"))
-        else:
+        elif table == "status":
             sql = "INSERT INTO Furnace_Log_Test (date, time, status) VALUES (%s, %s, %s)"
             val = (date, time, data)
         self.mycursor.execute(sql, val)
-
         self.mydb.commit()
         return 
 

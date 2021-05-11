@@ -10,6 +10,7 @@ class DataManager:
         self.currentTemps = []
         self.status = []
         self.mains = []
+        self.furnaceStatus = []
         
         #all messages should be stored in a df with Timestamp object
         
