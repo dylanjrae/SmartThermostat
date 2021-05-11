@@ -113,9 +113,6 @@ class Controller:
             print("Error in the HTTP request")
         return weatherTemp
 
-control = Controller("10.0.0.69")
-print("Welcome to the NutHouse Thermostat Server!")
-control.start_connection()
-control.client.loop_forever()
+
 
 
