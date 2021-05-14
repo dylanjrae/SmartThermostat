@@ -1,31 +1,45 @@
 #include <PubSubClient.h>
 #include <ESP8266WiFi.h>
-#include <WiFiClient.h>
-#include <ArduinoOTA.h>
-#include <WiFiUdp.h>
-#include <NTPClient.h>
-
-
-#include <ESP8266mDNS.h>
-#include <ESP8266WebServer.h>
+//#include <WiFiClient.h>
+//#include <ArduinoOTA.h>
+//#include <WiFiUdp.h>
+//#include <NTPClient.h>
+//#include <ESP8266mDNS.h>
+//#include <ESP8266WebServer.h>
 
 #ifndef STASSID
 #define STASSID "NUTHOUSE_2.4"
 #define STAPSK  "pmwpmwpmw"
 #define MQTTHOST "10.0.0.69"
 #define MQTTPORT 1883
+#define SLEEPTIME 10e6 //5 secs
+#define SETTEMP 15
 #endif
 
+//struct to store connection info
+ struct {
+  uint32_t crc32;   // 4 bytes
+  uint8_t channel;  // 1 byte,   5 in total
+  uint8_t ap_mac[6];// 6 bytes, 11 in total
+  uint8_t padding;  // 1 byte,  12 in total
+} rtcData;
+
+//Static IP
+IPAddress ip(10, 0, 0, 96);
+IPAddress gateway(10, 0, 0, 1);
+IPAddress subnet(255, 255, 255, 0);
+IPAddress dns(64, 59, 135, 148);
+
+//Temp Sensor interrupt
 void ICACHE_RAM_ATTR pulseDetect();
+volatile unsigned int pulseCount = 0;
 
-void handleRoot();
-void handleNotFound();
-void handleSetTemp();
-ESP8266WebServer server(80);
-
+//WIFI
 const char* ssid = STASSID;
 const char* password = STAPSK;
+bool rtcValid;
 
+//MQTT stuff
 const char* mqttServer = MQTTHOST;
 const int mqttPort = MQTTPORT;
 const char* mqttUser = NULL;
@@ -35,161 +49,48 @@ const int willQoS = 0;
 boolean willRetain = true;
 const char* willMessage = "F";
 
+//PINS
 const int led = D2;
 const int ssr = D6;
 const int tempIn = D5;
+
+//Global variables
 boolean overrideIO = false;
 boolean heating = false;
+long sleepTime = SLEEPTIME;
+float setTemp = SETTEMP;
+float currentTemp;
+unsigned int batt;
 
-int hour;
-
-
-float setTemp = 24;
-float currentTemp=0;
-
-volatile unsigned int pulseCount = 0;
-
-const long utcOffsetInSeconds = -25200;
-
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "north-america.pool.ntp.org", utcOffsetInSeconds);
-
+//For MQTT client
 WiFiClient espClient;
 PubSubClient client(espClient);
 
 
-void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived in topic: ");
-  Serial.println(topic);
-  Serial.print("Message:");
-  String message = "";
-  for (int i = 0; i < length; i++) {
-    //Serial.print((char)payload[i]);
-    message += (char)payload[i];
+uint32_t calculateCRC32(const uint8_t *data, size_t length) {
+  uint32_t crc = 0xffffffff;
+  while (length--) {
+    uint8_t c = *data++;
+    for (uint32_t i = 0x80; i > 0; i >>= 1 ) {
+      bool bit = crc & 0x80000000;
+      if ( c & i ) {
+        bit = !bit;
+      }
+
+      crc <<= 1;
+      if ( bit ) {
+        crc ^= 0x04c11db7;
+      }
+    }
   }
-  message[length] = '\0';
-  Serial.println(message);
-    
-    //Overriding
-    if(strcmp(topic, "therm/OVERRIDE") == 0) {
-      if( strncmp((char *)payload, "ON", length) == 0) {
-        overrideIO = true;
-        heating = true;
-        digitalWrite(led, HIGH);
-        digitalWrite(ssr, HIGH);
-      }
-      else if(strncmp((char *)payload, "OFF", length) == 0) {
-        overrideIO = true;
-        heating = false;
-        digitalWrite(led, LOW);
-        digitalWrite(ssr, LOW);
-      }
-      else if(strncmp((char *)payload, "CANCEL", length) == 0) {
-        overrideIO = false;
-      }
-      else if(strncmp((char *)payload, "REBOOT", length) == 0) {
-        ESP.reset();
-      }
-    }
-        //Setting temperature
-    if(strcmp(topic, "therm/TEMPSET") == 0) {
-      setNewTemp(message.toFloat());
-    }
-    
-  Serial.println();
+  return crc;
 }
 
-void connectWifi() {
-    WiFi.begin(ssid, password);
-    Serial.print("Connecting to WiFi Network: ");
-    Serial.print(ssid);
-    Serial.println(" ...");
-
-    int i = 0;
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(1000);
-      Serial.print(++i); Serial.print(' ');
-      //light blinks every other second when connecting then goes hard on after connecting
-      if (i % 2 == 1) {
-        digitalWrite(led, HIGH);
-      }
-      else {
-        digitalWrite(led, LOW);
-      }
-    }
-    digitalWrite(led, LOW);
-      
-    Serial.println("\n");
-    Serial.print("Connection established in "); Serial.print(i); Serial.println(" seconds!");
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
-  }
-
-void connectMQTT() {
-  //set up and connect to mqtt broker
-  client.setServer(mqttServer, mqttPort);
-  client.setCallback(callback);
-
-  while (!client.connected()) {
-    Serial.println("Attempting to connect to MQTT broker...");
-    if (client.connect("ESP8266Client", mqttUser, mqttPassword, willTopic, willQoS, willRetain, willMessage)) {
-      Serial.println("Connected to mqtt broker!");
-    }
-    else {
-      Serial.print("mqtt broker connection failed with state: ");
-      Serial.println(client.state());
-      delay(2000);
-    }
-    //while trying to connec tto mqtt do the following tasks
-      recordTemp();
-      checkTemp();
-      ArduinoOTA.handle();
-  }
-
-  client.publish("therm/main", "Welcome, the ESP8266 board is here.");
-  client.publish("therm/STATUS", "TRUE", true);
-  client.subscribe("therm/TEMPSET");
-  client.subscribe("therm/OVERRIDE");
+void ICACHE_RAM_ATTR pulseDetect() { //Pulse counter interrupt function
+  pulseCount++;
 }
 
-void startWebServer() {
-  if (MDNS.begin("thermostat")) {              // Start the mDNS responder for esp8266.local
-      Serial.println("mDNS responder started");
-    } else {
-      Serial.println("Error setting up MDNS responder!");
-    }
-  
-    server.on("/", HTTP_GET, handleRoot);        // Call the 'handleRoot' function when a client requests URI "/"
-    server.on("/SetTemp", HTTP_POST, handleSetTemp); // Call the 'handleLogin' function when a POST request is made to URI "/login"
-    server.onNotFound(handleNotFound);           // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
-  
-    server.begin();                            // Actually start the server
-    Serial.println("HTTP server started");
-}
-
-void handleRoot() {
-  server.send(200, "text/html", "<form action=\"/SetTemp\" method=\"POST\"><p>Welcome to the <b>NutHouse</b> Thermostat :)</p><img src=\"https://canadiantire.scene7.com/is/image/CanadianTire/1753194_1?defaultImage=image_na_EN&imageSet=CanadianTire/1753194_1?defaultImage=image_na_EN&id=-lir53&fmt=jpg&fit=constrain,1&wid=339&hei=200\" alt=\"NUTTT\"><p>The current room temperature is: <b>" + String(currentTemp) + "</b> degrees C</p><p>The current set temperature is: <b>" + String(setTemp) + "</b> degrees C</p> <p>Furnace on? (it's a boolean): " + String(heating) + "</p><input type=\"text\" name=\"setTemp\" placeholder=\"Enter new set temp\"></br></br><input type=\"submit\" value=\"Set Now!\"></form>");
-}
-
-void handleNotFound(){
-  server.send(404, "text/plain", "404: Not found"); // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
-}
-
-void handleSetTemp() {                         // If a POST request is made to URI /login
-  if( ! server.hasArg("setTemp") || server.arg("setTemp") == NULL) { // If the POST request doesn't have username and password data
-    server.send(400, "text/plain", "400: Invalid Request");         // The request is invalid, so send HTTP status 400
-    return;
-  }
-  if(server.arg("setTemp").toFloat() < 25.0 && server.arg("setTemp").toFloat() > 15.0) { // If temperature is in range
-    setNewTemp(server.arg("setTemp").toFloat());
-    server.send(200, "text/html", "<h2>The temperature was successfuly set to " + server.arg("setTemp") + " degrees C!</h2><p>And remember...<b>PMW</b> always</p>");
-  } 
-  else {                                                               // temp out of range
-    server.send(401, "text/plain", "401: Unauthorized/Error");
-  }
-}
-
-float getTemp() {//when called adds the reading to the array, once at the end it rewrites from the start
+void measureTemp() {//when called adds the reading to the array, once at the end it rewrites from the start
   attachInterrupt(digitalPinToInterrupt(tempIn), pulseDetect, FALLING);//using interrupt pin tp trigger on falling edge
 
   unsigned long conversionStartTime = millis();//keeps track of timing
@@ -208,8 +109,10 @@ float getTemp() {//when called adds the reading to the array, once at the end it
     if (pulseCount > 0)
       break;
   }
-  if (pulseCount == 0)
-    return 1000;//FAIL - never got a pulse
+  if (pulseCount == 0) {
+    currentTemp = 1069.0;//FAIL - never got a pulse
+    return;
+  }
 
   conversionStartTime = millis();//conversion done, so reset time
   unsigned int oldPulseCount = pulseCount;//just to help keep track of timings when pulse pin goes idle
@@ -228,82 +131,212 @@ float getTemp() {//when called adds the reading to the array, once at the end it
   //^^^ Stays stuck here counting pulese for 60ms
 
   if (pulseCount < 5) { //this is just noise, false trigger... I mean only 5 pulses, that can't be right
-    return 1000;//FAIL
+    currentTemp = 1420.0;//FAIL
+    return;
   }
 
   detachInterrupt(digitalPinToInterrupt(tempIn));//done with the interrupt
   float temperatureC = 256.000 * pulseCount / 4096.000 - 50;//conversion
   //see 7.3.2 Output Transfer Function in Datasheet
-
-  return temperatureC;//throw the temp back
+  currentTemp = temperatureC;
 }
 
-void ICACHE_RAM_ATTR pulseDetect() { //Pulse counter interrupt function
-  pulseCount++;
-}
 
-void updateTime() {
-  hour = timeClient.getHours();
-}
 
-void checkSchedule() {
-  //plus 1 for daylight savings time
-  if (hour +1 == 22) { 
-    setNewTemp(17.0);
+//MQTT callback
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived in topic: ");
+  Serial.println(topic);
+  Serial.print("Message:");
+  String message = "";
+  for (int i = 0; i < length; i++) {
+    //Serial.print((char)payload[i]);
+    message += (char)payload[i];
   }
-  else if (hour+1 == 5) {
-    setNewTemp(25);
+  message[length] = '\0';
+  Serial.println(message);
+    
+  //Overriding
+  if(strcmp(topic, "therm/OVERRIDE") == 0) {
+    if( strncmp((char *)payload, "ON", length) == 0) {
+      overrideIO = true;
+      heating = true;
+      digitalWrite(led, HIGH);
+      digitalWrite(ssr, HIGH);
+    }
+    else if(strncmp((char *)payload, "OFF", length) == 0) {
+      overrideIO = true;
+      heating = false;
+      digitalWrite(led, LOW);
+      digitalWrite(ssr, LOW);
+    }
+    else if(strncmp((char *)payload, "CANCEL", length) == 0) {
+      overrideIO = false;
+    }
+    else if(strncmp((char *)payload, "REBOOT", length) == 0) {
+      ESP.reset();
+    }
   }
-  else {
-    return;
+      //Setting temperature
+  if(strcmp(topic, "therm/TEMPSET") == 0) {
+//    Serial.println("Setting new temp");
+    setTemp = message.toFloat();
   }
 }
 
-void recordTemp() {
-  currentTemp = getTemp();
-}
+//void connectWifi() {
+//    WiFi.begin(ssid, password);
+//    Serial.print("Connecting to WiFi Network: ");
+//    Serial.print(ssid);
+//    Serial.println(" ...");
+//
+//    int i = 0;
+//    while (WiFi.status() != WL_CONNECTED) {
+//      delay(1000);
+//      Serial.print(++i); Serial.print(' ');
+//      //light blinks every other second when connecting then goes hard on after connecting
+//      if (i % 2 == 1) {
+//        digitalWrite(led, HIGH);
+//      }
+//      else {
+//        digitalWrite(led, LOW);
+//      }
+//    }
+//    digitalWrite(led, LOW);
+//      
+//    Serial.println("\n");
+//    Serial.print("Connection established in "); Serial.print(i); Serial.println(" seconds!");
+//    Serial.print("IP address: ");
+//    Serial.println(WiFi.localIP());
+// }
+void connectWiFi() {
+    WiFi.forceSleepWake();
+    delay(1);
+    
+    // Disable the WiFi persistence.  The ESP8266 will not load and save WiFi settings unnecessarily in the flash memory.
+    WiFi.persistent(false);
+    
+    // Bring up the WiFi connection
+    WiFi.mode(WIFI_STA);
+    WiFi.config(ip, dns, gateway, subnet);
+    //-----------Replacement for "WiFi.begin();" with a precedure using connection data stored by us
+    if (rtcValid) {
+      Serial.print("Connecting to WiFi Network: ");
+      Serial.print(ssid);
+      Serial.println(" with RTC info...");
+      // The RTC data was good, make a quick connection
+      WiFi.begin(ssid, password, rtcData.channel, rtcData.ap_mac, true );
+    }
+    else {
+      Serial.print("Connecting to WiFi Network: ");
+      Serial.print(ssid);
+      Serial.println(" with RTC info...");
+      // The RTC data was not valid, so make a regular connection
+      WiFi.begin(ssid, password);
+    }
 
-void setNewTemp(float newTemp) {
-  setTemp = newTemp;
-  Serial.print("The new set temp is: ");
-  Serial.println(String(setTemp));
-
-  String toSend = "The new temperature has been set to: " + String(setTemp) + " degrees C.";
-  const char* toSendChar = toSend.c_str();
-  client.publish("therm/main", toSendChar);
-}
-
-
-//when called prints the average of the last x readings
-void printTemp() {
-  Serial.print("The current room temperature is: ");
-  Serial.print(currentTemp);
-  Serial.println(" degress C");
-  Serial.print("The current set temperature is: ");
-  Serial.print(setTemp);
-  Serial.println(" degress C");
-  //print to MQTT
+    //------now wait for connection
+    int retries = 0;
+    int wifiStatus = WiFi.status();
+    while (wifiStatus != WL_CONNECTED) {
+      retries++;
+      
+      if ( retries == 100 ) {
+        // Quick connect is not working, reset WiFi and try regular connection
+        WiFi.disconnect();
+        delay(10);
+        WiFi.forceSleepBegin();
+        delay(10);
+        WiFi.forceSleepWake();
+        delay(10);
+        WiFi.begin(ssid, password);
+        
+      }
+      if (retries == 600) {
+        // Giving up after 30 seconds and going back to sleep
+        WiFi.disconnect(true);
+        delay(1);
+        WiFi.mode(WIFI_OFF);
+        ESP.deepSleep(SLEEPTIME, WAKE_RF_DISABLED );
+        return; // Not expecting this to be called, the previous call will never return.
+      }
+      //light blinks every other second when connecting then goes hard on after connecting
+      if (retries % 2 == 1) {
+        digitalWrite(led, HIGH);
+      }
+      else {
+        digitalWrite(led, LOW);
+      }
+      delay(50);
+      wifiStatus = WiFi.status();
+    }
+  digitalWrite(led, LOW);
   
-  //String toSend = "The current temperature is: " + String(currentTemp) + " degrees C.";
-  String toSend = String(currentTemp);
+  //---------
+  Serial.println("WiFi connected");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+
+//   Write current connection info back to RTC
+  rtcData.channel = WiFi.channel();
+  memcpy( rtcData.ap_mac, WiFi.BSSID(), 6 ); // Copy 6 bytes of BSSID (AP's MAC address)
+  rtcData.crc32 = calculateCRC32( ((uint8_t*)&rtcData) + 4, sizeof(rtcData) - 4 );
+  ESP.rtcUserMemoryWrite( 0, (uint32_t*)&rtcData, sizeof(rtcData));
+ }
+
+
+void reconnectMQTT() {
+//  Serial.println("reconnect MQTT called");
+  String clientID = "ESP8266Client";
+//  clientID += String(random(0xffff), HEX);
+  while (!client.connected()) {
+    if (client.connect(clientID.c_str(), mqttUser, mqttPassword, willTopic, willQoS, willRetain, willMessage)) {
+      Serial.println("Connected to mqtt broker!");
+    }
+    else {
+      Serial.print("mqtt broker connection failed with state: ");
+      Serial.println(client.state());
+      delay(2000);
+    }
+  }
+  sendMQTTmessage("therm/main", "Welcome, the ESP8266 board is here.");
+  client.publish("therm/STATUS", "TRUE", true);
+  client.subscribe("therm/OVERRIDE");
+  client.subscribe("therm/TEMPSET");
+}
+
+void sendDataRecord() {
+  if(!client.connected()) {
+    reconnectMQTT();
+  }
+  String toSend = String(currentTemp) + "/" + String(setTemp) + "/" + String(heating) + "/" + String(batt);
   const char* toSendChar = toSend.c_str();
-  client.publish("therm/CURRENTTEMP", toSendChar);
+  client.publish("therm/DATA", toSendChar);
+  Serial.println("Data record sent!");
+}
+
+void sendMQTTmessage(String topic, String message) {
+  if(!client.connected()) {
+    reconnectMQTT();
+  }
+  client.publish(topic.c_str(), message.c_str());
 }
 
 //should look at varying the +-0.25 to to optimize time on/off
-void checkTemp() {
+void checkHeating() {
   //should be a max temperature set and check that before keeping pins turned on
   if (overrideIO == true) {
     return;
   }
-  
+//  Serial.print("In checkHeating current is: " + String(currentTemp) + " set is: " + String(setTemp));
   if (currentTemp < setTemp-1.00) {
-    //digitalWrite(led, HIGH); //Turn on LED
+    digitalWrite(led, HIGH); //Turn on LED
     digitalWrite(ssr, HIGH);//turn on ssr
     heating = true;
+    
   }
   else if (currentTemp > setTemp+1.00) {
-    //digitalWrite(led, LOW); //turn off LED
+    digitalWrite(led, LOW); //turn off LED
     digitalWrite(ssr, LOW); //turn off ssr
     heating=false;
   }
@@ -314,123 +347,104 @@ void checkTemp() {
 
 
 void setup() {
+  Serial.begin(115200);
+  Serial.println("Booting");
+
+  //disable WiFi until we need it
+  WiFi.mode(WIFI_OFF);
+  WiFi.forceSleepBegin();
+  delay(1);
+
+  //Try to read WiFi settings from RTC mem
+  rtcValid = false;
+  if (ESP.rtcUserMemoryRead(0,(uint32_t*)&rtcData, sizeof(rtcData))) {
+    // Calculate the CRC of what we just read from RTC memory, but skip the first 4 bytes as that's the checksum itself.
+    uint32_t crc = calculateCRC32(((uint8_t*)&rtcData) + 4, sizeof(rtcData) - 4);
+    if (crc == rtcData.crc32) {
+      rtcValid = true;
+    }
+  }
+
   //setup pins
   pinMode(led, OUTPUT);
   pinMode(ssr, OUTPUT);
+  pinMode(tempIn, INPUT);
+  delay(10);
   digitalWrite(led, LOW); //turn off LED
   digitalWrite(ssr, LOW);
 
-  //connect to wifi
-  Serial.begin(115200);
-  Serial.println("Booting");
-  
-  connectWifi();
-  connectMQTT();
-  startWebServer();
-  timeClient.begin();
+  //Battery info
+  batt = ESP.getVcc()/1023.0F;
+  Serial.print("Battery Voltage: ");
+  Serial.println(batt);
 
-  ArduinoOTA.onStart([]() {
-    String type;
-    if (ArduinoOTA.getCommand() == U_FLASH) {
-      type = "sketch";
-    } else { // U_FS
-      type = "filesystem";
-    }
+  //Read Temperature
+  measureTemp();
 
-    // NOTE: if updating FS this would be the place to unmount FS using FS.end()
-    Serial.println("Start updating " + type);
-  });
-    
-  ArduinoOTA.onEnd([]() {
-    Serial.println("\nEnd");
-  });
+  //WiFi Time
+  connectWiFi();
+
+  //set up for MQTT broker
+  client.setServer(mqttServer, mqttPort);
+  client.setCallback(callback);
   
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-  });
-  
-  ArduinoOTA.onError([](ota_error_t error) {
-    Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) {
-      Serial.println("Auth Failed");
-    } else if (error == OTA_BEGIN_ERROR) {
-      Serial.println("Begin Failed");
-    } else if (error == OTA_CONNECT_ERROR) {
-      Serial.println("Connect Failed");
-    } else if (error == OTA_RECEIVE_ERROR) {
-      Serial.println("Receive Failed");
-    } else if (error == OTA_END_ERROR) {
-      Serial.println("End Failed");
-    }
-  });
-  ArduinoOTA.begin();
-  recordTemp();
 }
-  
 
 void loop() {
-  ArduinoOTA.handle();
-  timeClient.update();
-  server.handleClient();
-
-  if(WiFi.status() == WL_CONNECTION_LOST) {
-    Serial.println("WiFi connection lost! Reconnecting...");
-    connectWifi();
-    recordTemp();
-    checkTemp();
+  //checkHeating(); //check to see if we should be heating
+  //Should I check if WiFi disconnects?
+  if(!client.connected()) {
+//    Serial.println("Inside loop reconnectMQTT()");
+    reconnectMQTT();
   }
-  if(WiFi.status() == WL_DISCONNECTED) {
-    Serial.println("WiFi disconnected! Reconnecting...");
-    connectWifi();
-    recordTemp();
-    checkTemp();
+  
+  for(int i=0; i<10; i++) {
+    client.loop(); //ensure we have sent/received all messages
+    delay(100);
   }
-  if(!client.connected()){
-    connectMQTT();
-    recordTemp();
-    checkTemp();
-    ArduinoOTA.handle();
+  
+  checkHeating(); //if we dont need to heat should shut off wifi and only check every DEEPSLEEPTIME interval
+  measureTemp();
+  sendDataRecord();
+
+  if(!heating && !overrideIO) {
+    sendMQTTmessage("therm/main", "Entering a deep sleep");
+    Serial.print("Entering a deep sleep");
+    client.disconnect();
+    WiFi.disconnect(true);
+    delay(1);
+    ESP.deepSleep(SLEEPTIME, WAKE_RF_DISABLED);    
+//    ESP.deepSleep(SLEEPTIME);    
   }
-  client.loop();
-
-  //if currently heating stay in same loop
-  //if not heating go into deep sleep
-
-  //record temp measures temp and updates new ave
-  updateTime();
-  recordTemp();
-  checkTemp();
-  printTemp();
-  checkSchedule();
-//  String toSend = "The current hour is: " + String(hour);
-//  const char* toSendChar = toSend.c_str();
-//  client.publish("therm/main", toSendChar);
-
-  //could write temp schedukle into flash so it is still there when it boots up after deep sleep
-  //Serial.println("The current hour is: " + String(hour));
-  Serial.println("before therm/FURNACE, and heating is:" + String(heating));
-  if(heating) {
-    client.publish("therm/FURNACE", "1");
-    Serial.println("Insisde if therm/FURNACE, and heating is:" + String(heating));
-  }
-  else {
-    client.publish("therm/FURNACE", "0");
-    Serial.println("Inside else therm/FURNACE, and heating is:" + String(heating));
-  }
-
-  //should make a message board everyone can post to
-
-//could also implement deep sleep by checking the temp a set numbers of times then sleeping
-
-//DEEP SLEEP MODE HERE
-//   if(!heating && !overrideIO) {
-//should also make sure not having a ota (MQTT message to say OTA incoming, dont go to sleep
-//    client.publish("therm/main", "Entering a deep sleep");
-//    Serial.print("Entering a deep sleep");
-//    delay(1000);
-//    ESP.deepSleep(20e6);
-//    delay(10);
-//            
-//  }
   delay(5000);
+  
 }
+
+
+
+
+
+
+
+
+
+
+void printTemp() {
+  Serial.print("The current room temperature is: ");
+  Serial.print(currentTemp);
+  Serial.println(" degress C");
+  Serial.print("The current set temperature is: ");
+  Serial.print(setTemp);
+  Serial.println(" degress C");
+  //print to MQTT
+  
+  //String toSend = "The current temperature is: " + String(aveTemp) + " degrees C.";
+  String toSend = String(currentTemp);
+  const char* toSendChar = toSend.c_str();
+  client.publish("therm/CURRENTTEMP", toSendChar);
+}
+
+
+
+
+  
