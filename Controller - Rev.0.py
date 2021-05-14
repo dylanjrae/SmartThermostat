@@ -14,8 +14,8 @@ class Controller:
         self.mydb = mysql.connector.connect(host='10.0.0.69',user='root',port='3306', password='pmwpmwpmw',database='tempLog')
         self.mycursor = self.mydb.cursor()
         
-    def startMQTTconnection(self):
-        self.client = mqtt.Client(client_id="Python_BackEnd", clean_session=True, userdata=None, transport="tcp")
+    def start_connection(self):
+        self.client = mqtt.Client(client_id="Python_DashBoard", clean_session=True, userdata=None, transport="tcp")
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         
@@ -25,6 +25,7 @@ class Controller:
     # The callback for when the client receives a CONNACK response from the server.
     def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code "+str(rc))
+    
         # Subscribing in on_connect() means that if we lose the connection and
         # reconnect then subscriptions will be renewed.
         #client.subscribe("$SYS/#")
@@ -36,8 +37,6 @@ class Controller:
         client.subscribe("therm/CURRENTTEMP", qos=0)
         client.subscribe("therm/STATUS", qos=0)
         client.subscribe("therm/FURNACE", qos=0)
-        #main data channel
-        client.subscribe("therm/DATA")
         
     
     # The callback for when a PUBLISH message is received from the server.
@@ -49,12 +48,13 @@ class Controller:
         
         if message.topic == "therm/CURRENTTEMP":
             self.dataManager.currentTemps.append(float(message.payload))
-            # self.writeToSQL("temp", float(message.payload))
+            self.writeToSQL("temp", float(message.payload))
             
         if message.topic == "therm/FURNACE":
             self.dataManager.currentTemps.append(float(message.payload))
-            # self.writeToSQL("status", str(message.payload))
+            self.writeToSQL("status", str(message.payload))
             
+            #Need to record time of each temp
         elif message.topic == "therm/STATUS":
             self.dataManager.status.append(str(message.payload))
 
@@ -62,15 +62,22 @@ class Controller:
             self.dataManager.mains.append(str(message.payload))
 
         elif message.topic == "therm/OVERRIDE":
-            pass
-        
-        elif message.topic == "therm/DATA":
-            self.dataManager.data.append(str(message.paylod))
-            self.dataManager.writeToSQL("tempDataLog", str(message.paylod))
             
+            print("Received message '" + str(message.payload) + "' on topic '"
+            + message.topic + "' with QoS " + str(message.qos))
             
-            
-    
+    def writeToSQL(self, table, data):
+        date, time = self.getDateTime()
+
+        if table == "temp":
+            sql = "INSERT INTO Temperature_Log_Test (date, time, temperature, weatherTemp) VALUES (%s, %s, %s, %s)"
+            val = (date, time, data, self.getWeatherTemp("Calgary"))
+        elif table == "status":
+            sql = "INSERT INTO Furnace_Log_Test (date, time, status) VALUES (%s, %s, %s)"
+            val = (date, time, data)
+        self.mycursor.execute(sql, val)
+        self.mydb.commit()
+        return 
 
     def getDateTime(self):
         now = datetime.now()
