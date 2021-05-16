@@ -6,7 +6,7 @@ from datetime import datetime
 import requests, json
 
 
-class Controller:
+class Controller():
         
     def __init__(self, host):
         self.host = host
@@ -68,9 +68,6 @@ class Controller:
             self.dataManager.data.append(str(message.paylod))
             self.dataManager.writeToSQL("tempDataLog", str(message.paylod))
             
-            
-            
-    
 
     def getDateTime(self):
         now = datetime.now()
@@ -104,6 +101,7 @@ class Controller:
         else:
             # showing the error message
             print("Error in the HTTP request")
+            
         return weatherTemp
 
     control = Controller("10.0.0.69")

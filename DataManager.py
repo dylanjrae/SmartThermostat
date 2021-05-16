@@ -4,7 +4,7 @@ Created on Feb. 20, 2021
 @author: dylanrae
 '''
 
-class DataManager:
+class DataManager():
 
     def __init__(self):
         self.currentTemps = []
@@ -27,7 +27,9 @@ class DataManager:
         elif table == "status":
             sql = "INSERT INTO Furnace_Log_Test (date, time, status) VALUES (%s, %s, %s)"
             val = (date, time, data)
+
         self.mycursor.execute(sql, val)
         self.mydb.commit()
+
         return 
         
