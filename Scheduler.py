@@ -1,6 +1,8 @@
 # from PySide2 import QtGui, QtCore
 # import PySide2.QtWidgets as QBase
+import schedule
 import sys
+import time
 
 class Scheduler():
     """
@@ -24,6 +26,20 @@ class Scheduler():
     def updateTempDailySchedule(self):
         self.dataManager("Schedule", self.dailySchedule.temperatureDayScheduleDict)
 
+    def createScheduler(self):
+        schedule.clear()
+        for hour, setTemperature in self.dailySchedule.temperatureDayScheduleDict.items():
+            if setTemperature != "":
+                militaryTime = str(hour) + ":" +"00"
+                schedule.every().day.at(militaryTime).do(self.startHeating())
+
+    def setACertainHour(self, hour, temperature):
+        self.dailySchedule.temperatureDayScheduleDict[hour] = temperature
+        self.fetchCurrentDaySchedule()
+        return
+
+    def startHeating(self):
+        print("Run functions to turn on the furnace!")
 
 class DailySchedule():
     def __init__(self):
@@ -34,7 +50,7 @@ class DailySchedule():
             self.temperatureDayScheduleDict.update(timeEntry)
 
     def setDailySchedule(self, enteredSchedule):
-        pass
+        self.temperatureDayScheduleDict = enteredSchedule
     
     def __repr__(self):
         dailySchedule = "The current daily schedule is:"
@@ -49,10 +65,14 @@ class DailySchedule():
 
 if __name__ == "__main__":
     tempScheduler = Scheduler("dataManager")
+    tempScheduler.setACertainHour(6, 23)
+
+    while True:
+        schedule.run_pending()
+        time.sleep(10)
+
 
     # app = QtCore.QApplication(sys.argv)
     # window = QBase.QWidget()
     # window.setWindowTitle("Daily Temperature Scheduler")
     # layout = QBase.QVLayout()
-
-
