@@ -1,18 +1,17 @@
 import paho.mqtt.client as mqtt
 
 from DataManager import DataManager
-import mysql.connector
+
 from datetime import datetime
 import requests, json
 
 
-class Controller:
-        
+class Controller: 
     def __init__(self, host):
         self.host = host
-        self.dataManager = DataManager()  
-        self.mydb = mysql.connector.connect(host='10.0.0.69',user='root',port='3306', password='pmwpmwpmw',database='tempLog')
-        self.mycursor = self.mydb.cursor()
+        self.dataManager = DataManager(self.host)  
+        # self.mydb = mysql.connector.connect(host=self.host, user='root',port='3306', password='pmwpmwpmw',database='tempLog')
+        # self.mycursor = self.mydb.cursor()
         
     def startMQTTconnection(self):
         self.client = mqtt.Client(client_id="Python_BackEnd", clean_session=True, userdata=None, transport="tcp")
@@ -47,40 +46,31 @@ class Controller:
         print("Received message '" + str(message.payload) + "' on topic '"
             + message.topic + "' with QoS " + str(message.qos))
         
-        if message.topic == "therm/CURRENTTEMP":
-            self.dataManager.currentTemps.append(float(message.payload))
-            # self.writeToSQL("temp", float(message.payload))
+        # if message.topic == "therm/CURRENTTEMP":
+        #     self.dataManager.currentTemps.append(float(message.payload))
+        #     # self.writeToSQL("temp", float(message.payload))
             
-        if message.topic == "therm/FURNACE":
-            self.dataManager.currentTemps.append(float(message.payload))
-            # self.writeToSQL("status", str(message.payload))
+        # if message.topic == "therm/FURNACE":
+        #     self.dataManager.currentTemps.append(float(message.payload))
+        #     # self.writeToSQL("status", str(message.payload))
             
-        elif message.topic == "therm/STATUS":
-            self.dataManager.status.append(str(message.payload))
+        # elif message.topic == "therm/STATUS":
+        #     self.dataManager.status.append(str(message.payload))
 
-        elif message.topic == "therm/main":
-            self.dataManager.mains.append(str(message.payload))
+        # elif message.topic == "therm/main":
+        #     self.dataManager.mains.append(str(message.payload))
 
-        elif message.topic == "therm/OVERRIDE":
-            pass
+        # elif message.topic == "therm/OVERRIDE":
+        #     pass
         
-        elif message.topic == "therm/DATA":
-            self.dataManager.data.append(str(message.paylod))
-            self.dataManager.writeToSQL("tempDataLog", str(message.paylod))
-            
-            
-            
+        # Temp way to ignore the retained message on data
+        # if message.retain==1:
+        #     return
+        
+        if message.topic == "therm/DATA":
+            self.dataManager.data.append(str(message.payload))
+            self.dataManager.writeToSQL("thermData", str(message.payload))            
     
-
-    def getDateTime(self):
-        now = datetime.now()
-
-        date= now.strftime("%m/%d/%Y")
-        print("date:",date)
-
-        time = now.strftime("%H:%M:%S")
-        print("time:",time)
-        return date,time
 
     def getWeatherTemp(self, city):
         BASE_URL = "https://api.openweathermap.org/data/2.5/weather?"
@@ -105,10 +95,12 @@ class Controller:
             # showing the error message
             print("Error in the HTTP request")
         return weatherTemp
-
-    control = Controller("10.0.0.69")
-    print("Welcome to the NutHouse Thermostat Server!")
-    control.start_connection()
-    control.client.loop_start()
+    
+    
+#put this in a if__main__
+control = Controller("10.0.0.69")
+print("Welcome to the NutHouse Thermostat Server!")
+control.startMQTTconnection()
+control.client.loop_forever()
 
 
