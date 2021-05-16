@@ -3,6 +3,7 @@
 import schedule
 import sys
 import time
+import datetime
 
 class Scheduler():
     """
@@ -30,12 +31,14 @@ class Scheduler():
         schedule.clear()
         for hour, setTemperature in self.dailySchedule.temperatureDayScheduleDict.items():
             if setTemperature != "":
-                militaryTime = str(hour) + ":" +"00"
-                schedule.every().day.at(militaryTime).do(self.startHeating())
+                militaryTime = datetime.time(hour)
+                print(militaryTime)
+                schedule.every().day.at(str(militaryTime)).do(self.startHeating)
 
     def setACertainHour(self, hour, temperature):
         self.dailySchedule.temperatureDayScheduleDict[hour] = temperature
         self.fetchCurrentDaySchedule()
+        self.createScheduler()
         return
 
     def startHeating(self):
@@ -68,6 +71,7 @@ if __name__ == "__main__":
     tempScheduler.setACertainHour(6, 23)
 
     while True:
+        print(schedule.get_jobs())
         schedule.run_pending()
         time.sleep(10)
 
