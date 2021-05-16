@@ -32,16 +32,16 @@ class DataManager():
         elif table == "Schedule":
             print("Updating the schedule!")
 
-            sql = "INSERT INTO " + table + " (time, setTemperature) VALUES (%s, %s)"
+            sql = "UPDATE " + table + "SET" + "(time, setTemperature) = (%s, %s) WHERE time = (%s)"
+            #sql = "INSERT INTO " + table + " (time, setTemperature) VALUES (%s, %s)"
             for hour, setTemperature in data.items():
-                dataEntry = (hour, temperature)
+                dataEntry = (hour, setTemperature)
                 print("Inserting: " + dataEntry[0] +"/" + dataEntry[1])
-                self.mycursor.execute(sql, val)
+
+                self.mycursor.execute(sql, dataEntry, hour)
                 self.mydb.commit()
             
             return
-
-
 
 
         # elif table == "temp":
@@ -58,6 +58,8 @@ class DataManager():
         self.mydb.commit()
 
         return 
+    
+
     
     def getDateTime(self):
         now = datetime.now()
