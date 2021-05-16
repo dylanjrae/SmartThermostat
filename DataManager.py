@@ -29,7 +29,21 @@ class DataManager():
             val = (date, time, data.split("/")[0], data.split("/")[1], data.split("/")[2], data.split("/")[3])
             print("Inserting: " + data.split("/")[0] + "/" + data.split("/")[1] + "/" + data.split("/")[2] + "/" + data.split("/")[3])
         
-        
+        elif table == "Schedule":
+            print("Updating the schedule!")
+
+            sql = "INSERT INTO " + table + " (time, setTemperature) VALUES (%s, %s)"
+            for hour, setTemperature in data.items():
+                dataEntry = (hour, temperature)
+                print("Inserting: " + dataEntry[0] +"/" + dataEntry[1])
+                self.mycursor.execute(sql, val)
+                self.mydb.commit()
+            
+            return
+
+
+
+
         # elif table == "temp":
         #     sql = "INSERT INTO Temperature_Log_Test (date, time, temperature, weatherTemp) VALUES (%s, %s, %s, %s)"
 

@@ -21,6 +21,9 @@ class Scheduler():
         dailySchedule = self.dailySchedule.__repr__()
         print(dailySchedule)
 
+    def updateTempDailySchedule(self):
+        self.dataManager("Schedule", self.dailySchedule.temperatureDayScheduleDict)
+
 
 class DailySchedule():
     def __init__(self):
