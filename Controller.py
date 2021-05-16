@@ -94,6 +94,7 @@ class Controller:
         else:
             # showing the error message
             print("Error in the HTTP request")
+            
         return weatherTemp
     
     

@@ -6,7 +6,7 @@ Created on Feb. 20, 2021
 from datetime import datetime
 import mysql.connector
 
-class DataManager:
+class DataManager():
 
     def __init__(self, host):
         self.currentTemps = []
@@ -42,6 +42,7 @@ class DataManager:
         
         self.mycursor.execute(sql, val)
         self.mydb.commit()
+
         return 
     
     def getDateTime(self):
