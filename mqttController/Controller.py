@@ -69,7 +69,11 @@ class Controller:
         
         if message.topic == "therm/DATA":
             self.dataManager.data.append(str(message.payload))
-            self.dataManager.writeToSQL("thermData", str(message.payload))            
+            self.dataManager.writeToSQL("thermData", str(message.payload))
+        
+        # if message.topic == "therm/TEMPSET":
+            
+            # self.dataManager.writeToSQL("thermData", str(message.payload))           
     
 
     def getWeatherTemp(self, city):
@@ -103,5 +107,8 @@ control = Controller("10.0.0.69")
 print("Welcome to the NutHouse Thermostat Server!")
 control.startMQTTconnection()
 control.client.loop_forever()
+
+# Listen to db and whenever a new value there send it out
+# schedule needs to write in values to a db I need to create
 
 
