@@ -16,6 +16,8 @@ class DataManager():
         self.data = []
         self.host = host
         
+        self.setTemp = 17
+        
         self.mydb = mysql.connector.connect(host=self.host, user='root',port='3306', password='pmwpmwpmw',database='tempLog')
         self.mycursor = self.mydb.cursor()
         
@@ -28,6 +30,11 @@ class DataManager():
             sql = "INSERT INTO " + table + " (Date, Time, currentTemp, setTemp, heating, battery) VALUES (%s, %s, %s, %s, %s, %s)"
             val = (date, time, data.split("/")[0], data.split("/")[1], data.split("/")[2], data.split("/")[3])
             print("Inserting: " + data.split("/")[0] + "/" + data.split("/")[1] + "/" + data.split("/")[2] + "/" + data.split("/")[3])
+            
+            self.mycursor.execute(sql, val)
+            self.mydb.commit()
+
+            return 
         
         elif table == "Schedule":
             print("Updating the schedule!")
@@ -40,26 +47,26 @@ class DataManager():
 
                 self.mycursor.execute(sql, dataEntry, hour)
                 self.mydb.commit()
-            
             return
-
-
-        # elif table == "temp":
-        #     sql = "INSERT INTO Temperature_Log_Test (date, time, temperature, weatherTemp) VALUES (%s, %s, %s, %s)"
-
-        #     val = (date, time, data, self.getWeatherTemp("Calgary"))
-        # elif table == "status":
-        #     sql = "INSERT INTO Furnace_Log_Test (date, time, status) VALUES (%s, %s, %s)"
-        #     val = (date, time, data)
-        
-        
-        
-        self.mycursor.execute(sql, val)
-        self.mydb.commit()
-
-        return 
     
+    def checkSetTempChange(self):
+        # Cold just check the checksum first if thats faster than pulling temp value all the time
+        # sql = "SQL for CHECKSUM"
+        # self.mycursor.execute(sql)
+        # newCheckSum = self.mycursor.fetchall()
+        
+        sql = "SELECT * FROM thermData ORDER BY Date, Time DESC LIMIT 0,1" # need to figure out how to do this query expirement with phpmyadmin
+        self.mycursor.execute(sql)
+        newSetTemp = self.mycursor.fetchall()
+        
 
+        if(self.setTemp != newSetTemp):
+            self.setTemp = newSetTemp
+            return True
+        else:
+            return False
+        # check the new checksum against the old, if its different get the new temperature and store it in the class
+        
     
     def getDateTime(self):
         now = datetime.now()

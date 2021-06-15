@@ -29,6 +29,7 @@ def index():
             return 'There was an issue adding your task'
     else:
         return 'test'#render_template('index.html', tasks=tasks)
+
 @app.route('/form')
 def form():
     return render_template('form.html')

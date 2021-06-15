@@ -1,15 +1,18 @@
 import paho.mqtt.client as mqtt
 
 from DataManager import DataManager
+from Scheduler import Scheduler
 
 from datetime import datetime
 import requests, json
+import time
 
 
 class Controller: 
     def __init__(self, host):
         self.host = host
-        self.dataManager = DataManager(self.host)  
+        self.dataManager = DataManager(self.host)
+        self.client = None  
         # self.mydb = mysql.connector.connect(host=self.host, user='root',port='3306', password='pmwpmwpmw',database='tempLog')
         # self.mycursor = self.mydb.cursor()
         
@@ -29,6 +32,7 @@ class Controller:
         #client.subscribe("$SYS/#")
         
         #Channels to subscribe to:
+        print("Retained messages:")
         client.subscribe("therm/main", qos=0)
         client.subscribe("therm/TEMPSET", qos=0)
         client.subscribe("therm/OVERRIDE", qos=0)
@@ -101,12 +105,28 @@ class Controller:
             
         return weatherTemp
     
+    def checkSetTempChange(self):
+        newTemp = self.dataManager.checkSetTempChange()
+        if(newTemp):
+            self.client.publish("therm/TEMPSET", str(self.dataManager.setTemp), qos=0, retain=True)
+    
     
 #put this in a if__main__
 control = Controller("10.0.0.69")
 print("Welcome to the NutHouse Thermostat Server!")
 control.startMQTTconnection()
 control.client.loop_forever()
+# tempScheduler = Scheduler("dataManager")
+# tempScheduler.setACertainHour(6, 23)
+# while True:
+#     # print(scheduler.get_jobs())
+#     # scheduler.run_pending()
+    # control.checkSetTempChange()
+    # time.sleep(10)
+    # check if the temp table has changed in this loop too
+
+
+
 
 # Listen to db and whenever a new value there send it out
 # schedule needs to write in values to a db I need to create
