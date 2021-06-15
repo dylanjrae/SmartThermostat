@@ -6,7 +6,7 @@ Created on Feb. 20, 2021
 from datetime import datetime
 import mysql.connector
 
-class DataManager():
+class DataManager:
 
     def __init__(self, host):
         self.currentTemps = []
@@ -23,6 +23,8 @@ class DataManager():
         
     
     def writeToSQL(self, table, data):
+        # SHOULD BE USING BUILT IN MYSQL CURRENT-TIMSTAMP AND NOW
+        # INSTEAD OF GETTING DATE/TIME IN PYTHON
         date, time = self.getDateTime()
         if table == "thermData":
             sql = "INSERT INTO " + table + " (Date, Time, currentTemp, setTemp, heating, battery) VALUES (%s, %s, %s, %s, %s, %s)"

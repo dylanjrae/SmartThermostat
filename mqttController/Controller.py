@@ -103,12 +103,16 @@ class Controller:
     
     
 #put this in a if__main__
-control = Controller("10.0.0.69")
+control = Controller("127.0.0.1")
 print("Welcome to the NutHouse Thermostat Server!")
 control.startMQTTconnection()
 control.client.loop_forever()
 
 # Listen to db and whenever a new value there send it out
 # schedule needs to write in values to a db I need to create
+
+#compare the checksum to the old value
+#if different, get most recent data value
+#then publish
 
 
