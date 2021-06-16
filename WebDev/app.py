@@ -22,7 +22,7 @@ myDb = mysql.connector.connect(host='10.0.0.69',user='root',port='3306', passwor
 
 
 @app.route('/', methods=['POST', 'GET'])
-def index(self):
+def index():
     # if request.method == 'POST':
     #     task_content = request.form['content']
 
@@ -31,7 +31,7 @@ def index(self):
     #     except:
     #         return 'There was an issue adding your task'
     # else:
-    return 'Hello World'
+    return 'Bowser fucking sucks'
 
 # @app.route('/form')
 # def form():
