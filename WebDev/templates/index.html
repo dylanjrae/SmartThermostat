@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>SmartTherm</title>
+{% endblock %}
+
+{% block body %}
+<header id="header" class ="">
+    <h1>Nuthouse SmartTherm</h1>
+
+    <p><strong>Current Set Temp:</strong> {{ setTemp }} <span>&#176;</span>C</p>
+    <p><strong>Current Upstairs Temp:</strong> {{ upstairsTemp }} <span>&#176;</span>C</p>
+    <p><strong>Current Downstairs Temp:</strong> {{ downstairsTemp }}</p>
+    <p><strong>Furnace:</strong> {{ furnaceStatus }}</p>
+    <p><strong>Last Update:</strong> {{ date }}, {{ time }}</p>
+
+
+</header>
+
+
+
+
+
+{% endblock %}
