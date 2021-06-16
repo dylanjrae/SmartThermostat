@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask, render_template #, url_for, request, redirect
 #from flask_sqlalchemy import SQLAlchemy
 #from flask_mysqldb import MySQL
 import mysql.connector
@@ -23,6 +23,8 @@ myDb = mysql.connector.connect(host='10.0.0.69',user='root',port='3306', passwor
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
+    return render_template('index.html')
+    
     # if request.method == 'POST':
     #     task_content = request.form['content']
 
