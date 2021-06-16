@@ -28,7 +28,7 @@
 IPAddress ip(10, 0, 0, 96);
 IPAddress gateway(10, 0, 0, 1);
 IPAddress subnet(255, 255, 255, 0);
-IPAddress dns(64, 59, 135, 148);
+IPAddress dns(64, 59, 135, 148); //64, 59, 135, 148
 
 //Temp Sensor interrupt
 void ICACHE_RAM_ATTR pulseDetect();
