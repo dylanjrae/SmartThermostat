@@ -1,7 +1,7 @@
 import paho.mqtt.client as mqtt
 
 from DataManager import DataManager
-from Scheduler import Scheduler
+# from mqttController.Scheduler import Scheduler
 
 from datetime import datetime
 import requests, json
@@ -111,11 +111,11 @@ class Controller:
             self.client.publish("therm/TEMPSET", str(self.dataManager.setTemp), qos=0, retain=True)
     
     
-#put this in a if__main__
-control = Controller("127.0.0.1")
-print("Welcome to the NutHouse Thermostat Server!")
-control.startMQTTconnection()
-control.client.loop_forever()
+if __name__ == "__main__":
+    control = Controller("127.0.0.1")
+    print("Welcome to the NutHouse Thermostat Server!")
+    control.startMQTTconnection()
+    control.client.loop_forever()
 # tempScheduler = Scheduler("dataManager")
 # tempScheduler.setACertainHour(6, 23)
 # while True:

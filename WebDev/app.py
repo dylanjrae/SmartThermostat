@@ -7,9 +7,9 @@ import json
 import requests
 
 
+
+
 app = Flask(__name__)
-myDb = mysql.connector.connect(host='10.0.0.69',user='root',port='3306', password='pmwpmwpmw',database='tempLog')
-cursor = myDb.cursor()
 
 
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -24,12 +24,17 @@ cursor = myDb.cursor()
 #mysql = MySQL(app)
 
 
-statusSet = None
+
+
 @app.route('/', methods=['POST', 'GET'])
 def index():
     sql = "SELECT * FROM `thermData` ORDER BY `thermData`.`Date` DESC, `thermData`.`Time` DESC LIMIT 1"
+    
+    myDb = mysql.connector.connect(host='10.0.0.69',user='root',port='3306', password='pmwpmwpmw',database='tempLog')
+    cursor = myDb.cursor()
     cursor.execute(sql)
     result = cursor.fetchall()
+    cursor.close()
 
     if result[0][4] == 1:
         furnaceStatus = "ON"
@@ -47,8 +52,12 @@ def index():
 def currentStatus():
         # get the most recent data record
     sql = "SELECT * FROM `thermData` ORDER BY `thermData`.`Date` DESC, `thermData`.`Time` DESC LIMIT 1"
+    
+    myDb = mysql.connector.connect(host='10.0.0.69',user='root',port='3306', password='pmwpmwpmw',database='tempLog')
+    cursor = myDb.cursor()
     cursor.execute(sql)
     result = cursor.fetchall()
+    cursor.close()
 
     if result[0][4] == 1:
         furnaceStatus = "ON"
@@ -96,3 +105,4 @@ def currentStatus():
 
 if __name__ == "__main__":
     app.run(port=6969, debug=True, host='0.0.0.0') #0.0.0.0 makes it available to all devices on the network
+
