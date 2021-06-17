@@ -17,6 +17,10 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
         {% block body %}{% endblock %}
-        <!-- <script src="" async defer></script> -->
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="{{ url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+        
+        <script defer async type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
     </body>
 </html>

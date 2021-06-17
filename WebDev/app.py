@@ -26,27 +26,10 @@ app = Flask(__name__)
 
 
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/')
 def index():
-    sql = "SELECT * FROM `thermData` ORDER BY `thermData`.`Date` DESC, `thermData`.`Time` DESC LIMIT 1"
-    
-    myDb = mysql.connector.connect(host='10.0.0.69',user='root',port='3306', password='pmwpmwpmw',database='tempLog')
-    cursor = myDb.cursor()
-    cursor.execute(sql)
-    result = cursor.fetchall()
-    cursor.close()
 
-    if result[0][4] == 1:
-        furnaceStatus = "ON"
-    else:
-        furnaceStatus = "OFF"
-
-    date = result[0][0].strftime("%b %-d, %Y")
-    time = str(result[0][1])
-    
-    statusSet = {"setTemp" : result[0][3], "upstairsTemp" : result[0][2], "downstairsTemp" : "coming soon!", "furnaceStatus" : furnaceStatus, "date" : date, "time": time}
-
-    return render_template('index.html', **statusSet)
+    return render_template('index.html')
 
 @app.route('/api/currentStatus', methods=['GET'])
 def currentStatus():
@@ -70,37 +53,6 @@ def currentStatus():
     statusSet = {"setTemp" : result[0][3], "upstairsTemp" : result[0][2], "downstairsTemp" : "coming soon!", "furnaceStatus" : furnaceStatus, "date" : date, "time": time}
     return jsonify(statusSet)
 
-
-
-    # if request.method == 'POST':
-    #     task_content = request.form['content']
-
-    #     try:
-    #         return redirect('/login')
-    #     except:
-    #         return 'There was an issue adding your task'
-    # else:
-    # return 'Bowser fucking sucks'
-
-# @app.route('/form')
-# def form():
-#     return render_template('form.html')
- 
-# @app.route('/login', methods = ['POST', 'GET'])
-# def login():
-#     if request.method == 'GET':
-#         return redirect('/form')
-     
-#     if request.method == 'POST':
-#         name = request.form['name']
-#         age = request.form['age']
-#         cursor = mydb.cursor()
-#         sql = "INSERT INTO Furnace_Log_Test (date, time, status) VALUES (%s, %s, %s)"
-#         val = ('2021-05-13', '10:52:01', 0)
-#         cursor.execute(sql,val)
-#         mydb.commit()
-#         cursor.close()
-#         return 'Done!!'
 
 
 if __name__ == "__main__":
