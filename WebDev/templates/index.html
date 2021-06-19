@@ -12,7 +12,14 @@
     <p><strong>Current Upstairs Temp:</strong> <span id=upstairsTemp></span> <span>&#176;</span>C</p>
     <p><strong>Current Downstairs Temp:</strong> <span id=downstairsTemp></span></p>
     <p><strong>Furnace:</strong> <span id=furnaceStatus></span></p>
-    <p><strong>Last Update:</strong> <span id=time></span>, <span id=date></span></p>
+    <p><strong>Last Update:</strong> <span id=time></span> - <span id=date></span></p>
+
+    <form id="setTempForm">
+        <label for="newSetTemp">Enter a new set temperature: </label>
+        <input id="newSetTemp" name="newSetTemp" type="text" value="">
+        <input type="submit" value="Send">
+    </form>
+    <p><span id="setTempResult"></span></p>
 
 </header>
 {% endblock %}
