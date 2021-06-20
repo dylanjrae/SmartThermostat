@@ -1,25 +1,37 @@
+
 from flask import Flask, render_template, jsonify, request #, url_for, request, redirect
-from flask_mysqldb import MySQL #FOR SOMEREASON THIS CAN'T WORK IN A FUNCTION WITH A MQTT DECORATOR
+# from flask_mysqldb import MySQL #FOR SOMEREASON THIS CAN'T WORK IN A FUNCTION WITH A MQTT DECORATOR
 import mysql.connector
 from flask_mqtt import Mqtt
 
 from datetime import datetime
+
+# from Scheduler import Scheduler
 
 
 app = Flask(__name__)
 app.config.from_object('config.DevConfig')
 # mysqlDb = MySQL(app)
 mqtt = Mqtt(app)
+mqtt.subscribe("therm/DATA")
+
+# schd = Scheduler()
+# schd.setACertainHour(6, 23)
+
+
+
+
 
 
 # TO DO
-#  1. Integrate mqtt controller with flask
+#  1. DONE Integrate mqtt controller with flask
 #     Organize based on this guide: https://exploreflask.com/en/latest/organizing.html
 #  2. Add scheduler functionality Aidan made (should be stored in database not a dict)
-#  3. Add set temperature functionality to webpage
+#  3. DONE Add set temperature functionality to webpage
 #  4. Apply css and bootstrap formating
 #  5. Graphs of temperature over time with outside weather data
 #  6. Should have users for API/database login
+#  7. Add google home functionality (what is temp and set temp)
 
 # Get socket working for test
 # then try and see if it works on apache to trrouble shoot
@@ -64,11 +76,11 @@ def setTemp():
     val = (datetime.now().strftime("%Y-%m-%d"), datetime.now().strftime("%H:%M:%S"), userID, newTemp)
 
     # Connecting to db and inserting new data
-    # myDb = mysql.connector.connect(host=app.config['MYSQL_HOST'],user=app.config['MYSQL_USER'],port=app.config['MYSQL_PORT'], password=app.config['MYSQL_PASSWORD'],database=app.config['MYSQL_DB'])
-    # cursor = myDb.cursor()
-    # cursor.execute(sql, val)
-    # myDb.commit()
-    # cursor.close()
+    myDb = mysql.connector.connect(host=app.config['MYSQL_HOST'],user=app.config['MYSQL_USER'],port=app.config['MYSQL_PORT'], password=app.config['MYSQL_PASSWORD'],database=app.config['MYSQL_DB'])
+    cursor = myDb.cursor()
+    cursor.execute(sql, val)
+    myDb.commit()
+    cursor.close()
     
     # cur=mysqlDb.connection.cursor()
     # cur.execute(sql, val)
@@ -78,8 +90,9 @@ def setTemp():
 
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
+    mqtt.subscribe("therm/DATA") #FOR SOME REASON THIS IS NOT BEING EXECUTED, probably a problem with the shit flask mqtt
     print("Connected with result code "+str(rc))
-    mqtt.subscribe("therm/DATA")
+    
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
@@ -95,6 +108,8 @@ def handle_mqtt_message(client, userdata, message):
         # Connecting to db and inserting new data
         myDb = mysql.connector.connect(host=app.config['MYSQL_HOST'],user=app.config['MYSQL_USER'],port=app.config['MYSQL_PORT'], password=app.config['MYSQL_PASSWORD'],database=app.config['MYSQL_DB'])
         cursor = myDb.cursor()
+        # sql = "INSERT INTO thermData (Date, Time, currentTemp, setTemp, heating, battery) VALUES (%s, %s, %s, %s, %s, %s)"
+        # val = (datetime.now().strftime("%Y-%m-%d"), datetime.now().strftime("%H:%M:%S"), 69.69, 69.69, 69.69, 69.69)
         cursor.execute(sql, val)
         myDb.commit()
         cursor.close()

@@ -25,9 +25,10 @@ class DevConfig(Config):
     # MYSQL_CURSORCLASS = ''
 
     # MQTT
-    MQTT_BROKER_URL = '127.0.0.1'
-    MQTT_BROKER_PORT = 1883
+    MQTT_CLIENT_ID = "WebApp"
+    MQTT_BROKER_URL = '10.0.0.69'
+    MQTT_BROKER_PORT = 1883    
     MQTT_USERNAME = ''
     MQTT_PASSWORD = ''
-    MQTT_KEEPALIVE = 5
+    MQTT_KEEPALIVE = 20
     MQTT_TLS_ENABLED = False

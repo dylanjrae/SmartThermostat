@@ -15,7 +15,7 @@ class Scheduler():
 
     """
 
-    def __init__(self, dataManager):
+    def __init__(self, dataManager = None):
         self.dataManager = dataManager
         self.dailySchedule = DailySchedule()
         self.fetchCurrentDaySchedule()
@@ -25,7 +25,8 @@ class Scheduler():
         print(dailySchedule)
 
     def updateTempDailySchedule(self):
-        self.dataManager("Schedule", self.dailySchedule.temperatureDayScheduleDict)
+        #self.dataManager("Schedule", self.dailySchedule.temperatureDayScheduleDict)
+        pass
 
     def createScheduler(self):
         schedule.clear()
@@ -63,6 +64,9 @@ class DailySchedule():
             dailySchedule = dailySchedule + "\n Hour: " + str(key) + "\t Set Temperature: " + str(value)
 
         return dailySchedule
+
+    def run(self):
+        pass
 
 
 
