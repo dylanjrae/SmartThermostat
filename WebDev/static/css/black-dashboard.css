@@ -17008,15 +17008,15 @@ table.tablesorter thead tr .headerSortDown {
 }
 
 .fixed-plugin {
-  position: fixed;
-  right: 0;
-  width: 64px;
-  background: rgba(0, 0, 0, 0.3);
+  /* position: fixed; */
+  /* right: 0; */
+  /* width: 64px; */
+  /* background: rgba(0, 0, 0, 0.3); */
   z-index: 1031;
-  border-radius: 8px 0 0 8px;
+  /* border-radius: 8px 0 0 8px; */
   text-align: center;
-  top: 130px;
-}
+  /* top: 130px;  */
+} 
 
 .fixed-plugin li>a,
 .fixed-plugin .badge {
@@ -17026,25 +17026,24 @@ table.tablesorter thead tr .headerSortDown {
 }
 
 .fixed-plugin .fa-cog {
-  color: #ffffff;
-  padding: 10px;
-  border-radius: 0 0 6px 6px;
-  width: auto;
+  /* color: #ffffff; */
+  /* padding: 10px; */
+  padding-top: 10px;
+  padding-bottom: 10px;
+  /* border-radius: 0 0 6px 6px; */
+  /* width: auto; */
 }
 
 .fixed-plugin .dropdown-menu {
-  right: 80px;
+  right: 116px;
   left: auto !important;
-  top: -52px !important;
+  top: 50px !important;
   width: 290px;
   border-radius: 0.1875rem;
   padding: 0 10px;
   background: linear-gradient(#222a42, #1d253b);
 }
 
-.fixed-plugin .dropdown .dropdown-menu .tim-icons {
-  top: 5px;
-}
 
 .fixed-plugin .dropdown-menu:after,
 .fixed-plugin .dropdown-menu:before {

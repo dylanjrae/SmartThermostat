@@ -24,6 +24,8 @@
         <!-- Fonts and Icons -->
         <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800" rel="stylesheet" />
         <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/f24fddb5a2.js" crossorigin="anonymous"></script>
+
         <!-- css files -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/black-dashboard.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/nucleo-icons.css') }}"/>
@@ -51,37 +53,37 @@
                 </div>
                 <ul class="nav">
                   <li class="active ">
-                    <a href="./dashboard.html">
-                      <i class="nucleo-icons icon-chart-pie-36"></i>
+                    <a href="/">
+                      <i class="fas fa-home"></i>
                       <p>Home</p>
                     </a>
                   </li>
                   <li>
-                    <a href="./icons.html">
+                    <a href="#">
                       <i class="nucleo-icons icon-atom"></i>
                       <p>API Details</p>
                     </a>
                   </li>
                   <li>
-                    <a href="./map.html">
+                    <a href="#">
                       <i class="nucleo-icons icon-pin"></i>
                       <p>Help</p>
                     </a>
                   </li>
                   <li>
-                    <a href="./notifications.html">
+                    <a href="#">
                       <i class="nucleo-icons icon-bell-55"></i>
                       <p>Notifications</p>
                     </a>
                   </li>
                   <li>
-                    <a href="./user.html">
+                    <a href="#">
                       <i class="nucleo-icons icon-single-02"></i>
                       <p>User Profile</p>
                     </a>
                   </li>
                   <li>
-                    <a href="./tables.html">
+                    <a href="#">
                       <i class="nucleo-icons icon-puzzle-10"></i>
                       <p>Store</p>
                     </a>
@@ -130,6 +132,37 @@
                           <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Guest linked to google home</a></li>
                         </ul>
                       </li>
+
+                      <li class="  ">
+                        <div class="fixed-plugin">
+                          <div class="">
+                            <a href="#" data-toggle="dropdown">
+                              <i class="fa fa-cog fa-2x"> </i>
+                            </a>
+                            <ul class="dropdown-menu ">
+                              <li class="header-title"> Sidebar Background</li>
+                              <li class="adjustments-line">
+                                <a href="javascript:void(0)" class="switch-trigger background-color">
+                                  <div class="badge-colors text-center">
+                                    <span class="badge filter badge-primary active" data-color="primary"></span>
+                                    <span class="badge filter badge-info" data-color="blue"></span>
+                                    <span class="badge filter badge-success" data-color="green"></span>
+                                  </div>
+                                  <div class="clearfix"></div>
+                                </a>
+                              </li>
+                              <li class="adjustments-line text-center color-change">
+                                <span class="color-label">LIGHT MODE</span>
+                                <span class="badge light-badge mr-2"></span>
+                                <span class="badge dark-badge ml-2"></span>
+                                <span class="color-label">DARK MODE</span>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </li>
+
+
                       <li class="dropdown nav-item">
                         <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
                           <div class="photo">
@@ -189,7 +222,7 @@
                     ©
                     <script>
                       document.write(new Date().getFullYear())
-                    </script> made with <i class="nucleo-icons icon-heart-2"></i> by
+                    </script> made by
                     <a href="https://dylanrae.ca/" target="_blank" rel="noopener noreferrer">Dylan Rae</a>
                   </div>
                 </div>
@@ -200,7 +233,7 @@
 
 
         <!-- Settings icon -->
-        <div class="fixed-plugin">
+          <!-- <div class="fixed-plugin">
             <div class="dropdown show-dropdown">
               <a href="#" data-toggle="dropdown">
                 <i class="fa fa-cog fa-2x"> </i>
@@ -239,7 +272,7 @@
                 </li>
               </ul>
             </div>
-          </div>
+          </div> -->
 
 
 
