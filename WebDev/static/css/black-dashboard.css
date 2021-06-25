@@ -1,22 +1,3 @@
-/*!
-
-=========================================================
-* Black Dashboard - v1.0.1
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/black-dashboard
-* Copyright 2019 Creative Tim (https://www.creative-tim.com)
-
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-/*     brand Colors              */
-/* navbar color */
 :root {
   --blue: #5e72e4;
   --indigo: #5603ad;
@@ -2663,6 +2644,25 @@ fieldset:disabled a.btn {
   border-color: #e14eca;
   box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
 }
+
+.btn-primary[data="blue"] {
+  color: #ffffff;
+  background: #3358f4;
+  background: -webkit-linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
+  background: -o-linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
+  background: -moz-linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
+  background: linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
+}
+
+.btn-primary[data="green"] {
+  color: #ffffff;
+  background: #0098f0;
+  background: -webkit-linear-gradient(0deg, #0098f0 0%, #00f2c3 100%);
+  background: -o-linear-gradient(0deg, #0098f0 0%, #00f2c3 100%);
+  background: -moz-linear-gradient(0deg, #0098f0 0%, #00f2c3 100%);
+  background: linear-gradient(0deg, #0098f0 0%, #00f2c3 100%);
+}
+
 
 .btn-primary:hover {
   color: #ffffff;
@@ -17141,6 +17141,56 @@ table.tablesorter thead tr .headerSortDown {
   min-height: inherit;
 }
 
+#setTempForm {
+  display: block;
+  text-align: center;
+}
+
+.temp-button {
+  margin-top: 10px;
+
+}
+
+#knob {
+  width: 130px; /*needs to be same as width created in js*/
+  margin: auto;
+}
+
+.furnace-status-icon {
+  height: 150px;
+  width: 150px;
+  border-radius: 50%;
+  display: block;
+  margin: auto;
+  background: rgb(255,0,0);
+  background: -webkit-linear-gradient(150deg, rgba(255,0,0,1) 0%, rgba(255,110,0,0.81) 74%, rgba(246,100,50,0.76) 93%);
+  background: -o-linear-gradient(150deg, rgba(255,0,0,1) 0%, rgba(255,110,0,0.81) 74%, rgba(246,100,50,0.76) 93%);
+  background: -moz-linear-gradient(105deg, rgba(255,0,0,1) 0%, rgba(255,110,0,0.81) 74%, rgba(246,100,50,0.76) 93%);
+  background: linear-gradient(150deg, rgba(255,0,0,1) 0%, rgba(255,110,0,0.81) 74%, rgba(246,100,50,0.76) 93%);
+}
+
+.furnace-status-icon[data="ON"] {
+  background: rgb(255,0,0);
+  background: -webkit-linear-gradient(150deg, rgba(115,207,1,1) 0%, rgba(0,255,68,0.81) 55%, rgba(50,246,204,0.76) 93%);
+  background: -o-linear-gradient(150deg, rgba(115,207,1,1) 0%, rgba(0,255,68,0.81) 55%, rgba(50,246,204,0.76) 93%);
+  background: -moz-linear-gradient(150deg, rgba(115,207,1,1) 0%, rgba(0,255,68,0.81) 55%, rgba(50,246,204,0.76) 93%);
+  background: linear-gradient(150deg, rgba(115,207,1,1) 0%, rgba(0,255,68,0.81) 55%, rgba(50,246,204,0.76) 93%);
+}
+
+
+.furnace-status-text {
+  text-align: center;
+  padding-top: 10px;
+  margin-bottom: 0px;
+}
+
+.furnace-status-result {
+  font-weight: 500;
+  font-size: 35px;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+}
+
 .fixed-plugin li.button-container {
   height: auto;
 }
@@ -19948,7 +19998,8 @@ Copyright (c) 2015 Daniel Eden
 }
 
 .card .card-body {
-  padding: 15px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 .card .card-body.table-full-width {

@@ -29,12 +29,24 @@
           </div>
           <div class="card-body">
             <div class="chart-area">
-              <form id="setTempForm">
-                <label for="newSetTemp">Enter a new set temperature: </label>
-                <input id="newSetTemp" name="newSetTemp" type="text" value="">
-                <input type="submit" value="Send">
-            </form>
-            <p><span id="setTempResult"></span></p>
+              <div class="setTempCard">
+                  <div id="knob"></div>
+
+                  <form id="setTempForm">
+                    <!-- <div class="form-container"> -->
+                      <label for="newSetTemp">Enter your desired temperature: </strong></label>
+                    <!-- </div> -->
+                    
+                    <!-- <div class="form-container"> -->
+                      <input id="newSetTemp" name="newSetTemp" type="text" placeholder="Enter temp">
+                    <!-- </div> -->
+                    
+                    <!-- <div class="form-container"> -->
+                      <p><span id="setTempResult"></span></p>
+                      <button type="submit" class="temp-button btn btn-primary btn-round">Set</button>
+                    <!-- </div> -->
+                  </form>
+                </div>
               <!-- <canvas id="CountryChart"></canvas> -->
             </div>
           </div>
@@ -48,7 +60,12 @@
           </div>
           <div class="card-body">
             <div class="chart-area">
-              <canvas id="chartLineGreen"></canvas>
+              <span class="furnace-status-icon"></span>
+              <h5 class="furnace-status-text">Furnace Status:</h5> <p class="furnace-status-result"></p>
+
+
+
+
             </div>
           </div>
         </div>
@@ -70,21 +87,21 @@
                     <input type="radio" name="options" checked>
                     <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Day</span>
                     <span class="d-block d-sm-none">
-                      <i class="nucleo-icons icon-single-02"></i>
+                      <i class="fas fa-calendar-day"></i>
                     </span>
                   </label>
                   <label class="btn btn-sm btn-primary btn-simple" id="1">
                     <input type="radio" class="d-none d-sm-none" name="options">
                     <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Week</span>
                     <span class="d-block d-sm-none">
-                      <i class="nucleo-icons icon-gift-2"></i>
+                      <i class="fas fa-calendar-week"></i>
                     </span>
                   </label>
                   <label class="btn btn-sm btn-primary btn-simple" id="2">
                     <input type="radio" class="d-none" name="options">
                     <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Month</span>
                     <span class="d-block d-sm-none">
-                      <i class="nucleo-icons icon-tap-02"></i>
+                      <i class="far fa-calendar"></i>
                     </span>
                   </label>
                 </div>
@@ -121,19 +138,9 @@
           </div>
           <div class="card-body">
               <h1>Coming Soon!</h1>
-
-            <p><strong>Current Set Temp:</strong> <span class=setTemp></span> <span>&#176;</span>C</p>
-            <p><strong>Current Upstairs Temp:</strong> <span class=upstairsTemp></span> <span>&#176;</span>C</p>
-            <p><strong>Current Downstairs Temp:</strong> <span class=downstairsTemp></span></p>
-            <p><strong>Furnace:</strong> <span class=furnaceStatus></span></p>
-            <p><strong>Last Update:</strong> <span class=time></span> - <span id=date></span></p>
-
-            <form id="setTempForm">
-                <label for="newSetTemp">Enter a new set temperature: </label>
-                <input id="newSetTemp" name="newSetTemp" type="text" value="">
-                <input type="submit" value="Send">
-            </form>
-            <p><span id="setTempResult"></span></p>
+              <div class="chart-area">
+                <canvas id="chartLineGreen"></canvas>
+              </div>
           </div>
         </div>
       </div>
