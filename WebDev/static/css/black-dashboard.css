@@ -4783,14 +4783,48 @@ input[type="button"].btn-block {
 }
 
 .navbar-brand {
-  display: inline-block;
-  padding-top: 0.406813rem;
+  /* display: inline-block; */
+  /* /* padding-top: 0.406813rem;
   padding-bottom: 0.406813rem;
   margin-right: 0.9375rem;
   font-size: 0.99925rem;
   line-height: inherit;
-  white-space: nowrap;
+  white-space: nowrap; */
+} */
+
+.navbar-brand, .navbar-brand:before, .navbar-brand span {
+  display: block;
+  margin: 0;
+  padding: 0;
 }
+
+.navbar-brand, .navbar-brand:before, .navbar-brand:after {
+  position: relative;
+}
+
+.navbar-brand {
+  top: -60px;
+}
+
+.navbar-brand:before {
+  content: 'Thermostat Dashboard';
+  top: 95px;
+  transform: scale(1, -1);
+  backface-visibility: visible; 
+  z-index: 1;
+}
+
+.navbar-brand:after {
+  content: '';
+  display: block;
+  top: -10px;
+  left: 0;
+  width: 100%;
+  height: 60px; 
+  /* background-image: linear-gradient(to bottom, rgba(255,255,255, .4) 0%, rgba(255, 255, 255, 1) 50%); */
+  z-index: 2;
+}
+
 
 .navbar-brand:hover,
 .navbar-brand:focus {
@@ -17156,7 +17190,10 @@ table.tablesorter thead tr .headerSortDown {
   margin: auto;
 }
 
-.furnace-status-icon {
+
+
+
+.blob {/* .furnace-status-icon { */
   height: 150px;
   width: 150px;
   border-radius: 50%;
@@ -17167,9 +17204,30 @@ table.tablesorter thead tr .headerSortDown {
   background: -o-linear-gradient(150deg, rgba(255,0,0,1) 0%, rgba(255,110,0,0.81) 74%, rgba(246,100,50,0.76) 93%);
   background: -moz-linear-gradient(105deg, rgba(255,0,0,1) 0%, rgba(255,110,0,0.81) 74%, rgba(246,100,50,0.76) 93%);
   background: linear-gradient(150deg, rgba(255,0,0,1) 0%, rgba(255,110,0,0.81) 74%, rgba(246,100,50,0.76) 93%);
+
+  box-shadow: 0 0 0 0 rgba(0, 0, 0, 1);
+	transform: scale(1);
+	animation: pulse 4s infinite;
 }
 
-.furnace-status-icon[data="ON"] {
+@keyframes pulse {
+	0% {
+		transform: scale(0.9);
+		box-shadow: 0 0 0 0 rgba(255,110,0,0.81);
+	}
+
+	50% {
+		transform: scale(1.05);
+		box-shadow: 0 0 0 8px rgba(0, 0, 0, 0);
+	}
+
+	100% {
+		transform: scale(0.9);
+		box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+	}
+}
+
+.blob[data="ON"] {
   background: rgb(255,0,0);
   background: -webkit-linear-gradient(150deg, rgba(115,207,1,1) 0%, rgba(0,255,68,0.81) 55%, rgba(50,246,204,0.76) 93%);
   background: -o-linear-gradient(150deg, rgba(115,207,1,1) 0%, rgba(0,255,68,0.81) 55%, rgba(50,246,204,0.76) 93%);
@@ -17190,6 +17248,8 @@ table.tablesorter thead tr .headerSortDown {
   color: rgba(255, 255, 255, 0.8);
   text-align: center;
 }
+
+
 
 .fixed-plugin li.button-container {
   height: auto;

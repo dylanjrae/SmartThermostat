@@ -5,8 +5,9 @@ $(document).ready(function() {
 // *********UPDATING DATA METRICS*******************
         // var basePath = "http://10.0.0.69/smartTherm"; //For production deployment DEBUG=False, Testing = True
         // var basePath = "http://70.72.206.93/"; 
-        var basePath = "http://smarttherm.dylanrae.ca"; 
+        // var basePath = "http://smarttherm.dylanrae.ca"; 
         // var basePath = ""; //for testing environment
+        // var basePath = window.location.hostname
         var request
 
         var knob = pureknob.createKnob(130,130);
@@ -44,10 +45,10 @@ $(document).ready(function() {
                     $("#time").text(result.time);
                     $("#date").text(result.date);
                     // print(result.furnaceStatus.toString());
-                    if (result.furnaceStatus.toString() == "ON") {
+                    if (result.furnaceStatus.toString() == "ONr") {
                         console.log("here");
-                        if ($(".furnace-status-icon").length != 0) {
-                            $(".furnace-status-icon").attr('data', "ON");
+                        if ($(".blob").length != 0) {
+                            $(".blob").attr('data', "ON");
                         }
                     }
                 },
