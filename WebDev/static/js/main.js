@@ -6,7 +6,7 @@ $(document).ready(function() {
         // var basePath = "http://10.0.0.69/smartTherm"; //For production deployment DEBUG=False, Testing = True
         // var basePath = "http://70.72.206.93/"; 
         // var basePath = "http://smarttherm.dylanrae.ca"; 
-        // var basePath = ""; //for testing environment
+        var basePath = ""; //for testing environment
         // var basePath = window.location.hostname
         var request
 

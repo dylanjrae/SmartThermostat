@@ -17181,7 +17181,7 @@ table.tablesorter thead tr .headerSortDown {
 }
 
 .temp-button {
-  margin-top: 10px;
+  margin-top: 5px;
 
 }
 
@@ -20333,6 +20333,7 @@ Copyright (c) 2015 Daniel Eden
 .card-chart .card-body {
   padding-left: 5px;
   padding-right: 5px;
+  padding-top: 5px;
 }
 
 .card-chart .card-body .tab-space {
@@ -20550,6 +20551,3 @@ Copyright (c) 2015 Daniel Eden
 .card-plain:not(.card-subcategories).card-body {
   padding-left: 0;
   padding-right: 0;
-}
-
-/*# sourceMappingURL=dashboard-free.css.map */
