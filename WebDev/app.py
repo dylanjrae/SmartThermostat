@@ -32,6 +32,7 @@ mqtt.subscribe("therm/DATA")
 #  5. Graphs of temperature over time with outside weather data
 #  6. Should have users for API/database login
 #  7. Add google home functionality (what is temp and set temp)
+#  8. Clean up css code and all files in general
 
 # Get socket working for test
 # then try and see if it works on apache to trrouble shoot

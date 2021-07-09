@@ -15,7 +15,7 @@ $(document).ready(function() {
         // Set properties.
         knob.setProperty('angleStart', -0.75 * Math.PI);
         knob.setProperty('angleEnd', 0.75 * Math.PI);
-        knob.setProperty('colorFG', '#4081DF');
+        knob.setProperty('colorFG', '#ba54f5');
         knob.setProperty('readonly', true);
         knob.setProperty('trackWidth', 0.4);
         knob.setProperty('valMin', 14);

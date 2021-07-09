@@ -99,6 +99,8 @@ demo = {
           fill: true,
           backgroundColor: gradientFill,
           borderWidth: 2,
+
+
           data: [542, 480, 430, 550, 530, 453, 380, 434, 568, 610, 700, 630]
         }]
       },
@@ -374,6 +376,9 @@ demo = {
         pointHoverRadius: 4,
         pointHoverBorderWidth: 15,
         pointRadius: 4,
+
+                  //make a request to FLASK for data of past hour
+                  //Flask also to provide time stamps for labels
         data: [80, 100, 70, 80, 120, 80],
       }]
     };

@@ -4783,47 +4783,14 @@ input[type="button"].btn-block {
 }
 
 .navbar-brand {
-  /* display: inline-block; */
-  /* /* padding-top: 0.406813rem;
+  display: inline-block;
+  padding-top: 0.406813rem;
   padding-bottom: 0.406813rem;
   margin-right: 0.9375rem;
   font-size: 0.99925rem;
   line-height: inherit;
-  white-space: nowrap; */
-} */
-
-.navbar-brand, .navbar-brand:before, .navbar-brand span {
-  display: block;
-  margin: 0;
-  padding: 0;
-}
-
-.navbar-brand, .navbar-brand:before, .navbar-brand:after {
-  position: relative;
-}
-
-.navbar-brand {
-  top: -60px;
-}
-
-.navbar-brand:before {
-  content: 'Thermostat Dashboard';
-  top: 95px;
-  transform: scale(1, -1);
-  backface-visibility: visible; 
-  z-index: 1;
-}
-
-.navbar-brand:after {
-  content: '';
-  display: block;
-  top: -10px;
-  left: 0;
-  width: 100%;
-  height: 60px; 
-  /* background-image: linear-gradient(to bottom, rgba(255,255,255, .4) 0%, rgba(255, 255, 255, 1) 50%); */
-  z-index: 2;
-}
+  white-space: nowrap;
+} 
 
 
 .navbar-brand:hover,
@@ -17218,7 +17185,7 @@ table.tablesorter thead tr .headerSortDown {
 
 	50% {
 		transform: scale(1.05);
-		box-shadow: 0 0 0 8px rgba(0, 0, 0, 0);
+		box-shadow: 0 0 0 12px rgba(0, 0, 0, 0);
 	}
 
 	100% {
@@ -20551,3 +20518,4 @@ Copyright (c) 2015 Daniel Eden
 .card-plain:not(.card-subcategories).card-body {
   padding-left: 0;
   padding-right: 0;
+}
