@@ -6,7 +6,7 @@ $(document).ready(function() {
         // var basePath = "http://10.0.0.69/smartTherm"; //For production deployment DEBUG=False, Testing = True
         // var basePath = "http://70.72.206.93/"; 
         // var basePath = "http://smarttherm.dylanrae.ca"; 
-        // var basePath = ""; //for testing environment
+        var basePath = ""; //for testing environment
         // var basePath = window.location.hostname
         var request
 
@@ -15,7 +15,7 @@ $(document).ready(function() {
         // Set properties.
         knob.setProperty('angleStart', -0.75 * Math.PI);
         knob.setProperty('angleEnd', 0.75 * Math.PI);
-        knob.setProperty('colorFG', '#4081DF');
+        knob.setProperty('colorFG', '#ba54f5');
         knob.setProperty('readonly', true);
         knob.setProperty('trackWidth', 0.4);
         knob.setProperty('valMin', 14);
