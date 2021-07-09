@@ -13,7 +13,7 @@ class ProdConfig(Config):
 
 
 class DevConfig(Config):
-    DEBUG = True
+    DEBUG = False
     TESTING = True
 
     # Datebase

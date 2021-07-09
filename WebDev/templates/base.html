@@ -33,6 +33,16 @@
         <!-- Css for demo purpose -->
         <link rel="stylesheet" href="{{ url_for('static', filename='demo/demo.css') }}"/>
 
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-006Y0YYMVQ"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-006Y0YYMVQ');
+        </script>
+
         {% block head %}{% endblock %}
     </head>
     <body>
