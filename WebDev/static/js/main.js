@@ -45,7 +45,7 @@ $(document).ready(function() {
                     $("#time").text(result.time);
                     $("#date").text(result.date);
                     // print(result.furnaceStatus.toString());
-                    if (result.furnaceStatus.toString() == "ONr") {
+                    if (result.furnaceStatus.toString() == "ON") {
                         console.log("here");
                         if ($(".blob").length != 0) {
                             $(".blob").attr('data', "ON");

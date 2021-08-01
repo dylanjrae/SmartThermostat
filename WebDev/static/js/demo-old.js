@@ -99,6 +99,8 @@ demo = {
   //         fill: true,
   //         backgroundColor: gradientFill,
   //         borderWidth: 2,
+
+
   //         data: [542, 480, 430, 550, 530, 453, 380, 434, 568, 610, 700, 630]
   //       }]
   //     },
@@ -170,18 +172,7 @@ demo = {
         xPadding: 12,
         mode: "nearest",
         intersect: 0,
-        position: "nearest",
-        callbacks: {
-          label: function(tooltipItem, data) {
-            var label = data.datasets[tooltipItem.datasetIndex].label || '';
-
-            if (label) {
-                label += ': ';
-            }
-            label += Math.round(tooltipItem.yLabel * 10) / 10 + String.fromCharCode(176) + 'C';
-            return label;
-          },
-        }
+        position: "nearest"
       },
       responsive: true,
       scales: {
@@ -193,8 +184,8 @@ demo = {
             zeroLineColor: "transparent",
           },
           ticks: {
-            suggestedMin: 22,
-            suggestedMax: 28,
+            suggestedMin: 60,
+            suggestedMax: 125,
             padding: 20,
             fontColor: "#9a9a9a"
           }
@@ -369,9 +360,9 @@ demo = {
     gradientStroke.addColorStop(0, 'rgba(119,52,169,0)'); //purple colors
 
     var data = {
-      labels: ['-10hr', '-8hr', '-6hr', '-4hr', '-2hr', 'NOW'],
+      labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'TEST'],
       datasets: [{
-        label: "Average temp.",
+        label: "Data",
         fill: true,
         backgroundColor: gradientStroke,
         borderColor: '#d048b6',
@@ -385,61 +376,26 @@ demo = {
         pointHoverRadius: 4,
         pointHoverBorderWidth: 15,
         pointRadius: 4,
-        data: [],
-        // data: temps
+        data: [69, 100, 70, 80, 120, 10],
       }]
+
     };
 
+    getGraphData(now, end); //get data for time range now-end
+    //average data down to  6 data points
+    //update data for chart
+    //plot chart
+    //What to do if thermostat was offline? --> need to have some sort of error handling for that
 
 
     //making the first small chart
-
-    var twelveHourChart = new Chart(ctx, {
+    var myChart = new Chart(ctx, {
       type: 'line',
       data: data,
       options: gradientChartOptionsConfigurationWithTooltipPurple
     });
 
-    // hourCount --> number of hours back to go
-    // intervals --> number of intervals to average into
-    function getGraphData(hourCount, intervals) {
-      //end date time is now
-      //start date time is now-# of hours
-      var endDateTime = dayjs();
-      var startDateTime = endDateTime.subtract(hourCount, 'hour');
-
-      endDateTime = endDateTime.format('YYYY-MM-DD HH:mm:ss');
-      startDateTime = startDateTime.format('YYYY-MM-DD HH:mm:ss');
-      
-      $.ajax({
-        url: '/api/historicalTemp?startDateTime='+ startDateTime + '&endDateTime=' + endDateTime + '&intervals=' + intervals,
-        type: "GET",
-        dataType: 'json',
-        success: function(result) {
-          temps = [];
-          counts = [];
-          for (const key in result) {
-            temps.push(result[key][0]);
-            counts.push(result[key][1]);
-
-            console.log(`${key} : ${result[key][0]}`);
-          }
-          console.log(temps);
-          console.log(counts);
-          twelveHourChart.data.datasets[0].data = temps;
-          twelveHourChart.update();
-          return temps;
-        },
-        error: function(error) {
-          console.log('Error ${error}');
-        }
-      })
-    }
-
-    getGraphData(12, 6);
-
-
-
+    //config for the green chart
     var ctxGreen = document.getElementById("chartLineGreen").getContext("2d");
 
     var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
@@ -451,7 +407,7 @@ demo = {
     var data = {
       labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV'],
       datasets: [{
-        label: "Past 12 hr temperature trend",
+        label: "My First dataset",
         fill: true,
         backgroundColor: gradientStroke,
         borderColor: '#00d6b4',
@@ -466,26 +422,10 @@ demo = {
         pointHoverBorderWidth: 15,
         pointRadius: 4,
         data: [90, 27, 60, 12, 80],
-        },
-        { label: "Past 12 hr temperature trend",
-          fill: true,
-          backgroundColor: gradientStroke,
-          borderColor: '#00d6b4',
-          borderWidth: 2,
-          borderDash: [],
-          borderDashOffset: 0.0,
-          pointBackgroundColor: '#00d6b4',
-          pointBorderColor: 'rgba(255,255,255,0)',
-          pointHoverBackgroundColor: '#00d6b4',
-          pointBorderWidth: 20,
-          pointHoverRadius: 4,
-          pointHoverBorderWidth: 15,
-          pointRadius: 4,
-          data: [25, 25, 25, 25, 25, 25],
-          }
-      ]
+      }]
     };
 
+    //making the green chart
     var myChart = new Chart(ctxGreen, {
       type: 'line',
       data: data,
@@ -580,7 +520,7 @@ demo = {
           borderWidth: 2,
           borderDash: [],
           borderDashOffset: 0.0,
-          data: [53, 20, 10, 80, 100, 45],
+          data: [53, 20, 10, 20, 20, 20],
         }]
       },
       options: gradientBarChartConfiguration
@@ -794,23 +734,21 @@ demo = {
   //   marker.setMap(map);
   // },
 
+  showNotification: function(from, align) {
+    color = Math.floor((Math.random() * 4) + 1);
 
+    $.notify({
+      icon: "tim-icons icon-bell-55",
+      message: "Welcome to your smart thermostat!"
 
-  // showNotification: function(from, align) {
-  //   color = Math.floor((Math.random() * 4) + 1);
-
-  //   $.notify({
-  //     icon: "tim-icons icon-bell-55",
-  //     message: "Welcome to <b>Black Dashboard</b> - a beautiful freebie for every web developer."
-
-  //   }, {
-  //     type: type[color],
-  //     timer: 8000,
-  //     placement: {
-  //       from: from,
-  //       align: align
-  //     }
-  //   });
-  // }
+    }, {
+      type: type[color],
+      timer: 8000,
+      placement: {
+        from: from,
+        align: align
+      }
+    });
+  }
 
 };
