@@ -5,6 +5,8 @@ import mysql.connector
 from flask_mqtt import Mqtt
 
 from datetime import datetime
+import pandas as pd
+from pandas.core.algorithms import diff
 
 # from Scheduler import Scheduler
 
@@ -88,6 +90,59 @@ def setTemp():
     # mysqlDb.connection.commit()
     # cur.close()
     return 'Success!'
+
+
+# startDateTime --> starting date and time for temp data in the format YYYY-MM-DD HH:MM:SS
+# endDateTime --> starting date and time for temp data in the format YYYY-MM-DD HH:MM:SS
+# intervals --> number of intervals to average the data over
+# returns averaged temps for number of points specified from past (0) to present (intervals-1)
+@app.route('/api/historicalTemp', methods=['GET'])
+def historicalTemp():
+    # recevies time stamps for desired interval
+    # recieves number of periods to divide into
+    
+    args = request.args
+    # print(args)
+    
+    dateTimeStart = args["startDateTime"]
+    dateTimeEnd = args["endDateTime"]
+    intervalCount = int(args["intervals"])
+    
+    sql = "SELECT thermData.Date, thermData.Time, thermData.currentTemp FROM thermData WHERE TIMESTAMP(thermData.Date, thermData.Time) >= '" +dateTimeStart+ "' AND TIMESTAMP(`Date`, `Time`) <= '" + dateTimeEnd + "' ORDER BY thermData.Date DESC, thermData.Time DESC"
+
+    myDb = mysql.connector.connect(host=app.config['MYSQL_HOST'],user=app.config['MYSQL_USER'],port=app.config['MYSQL_PORT'], password=app.config['MYSQL_PASSWORD'],database=app.config['MYSQL_DB'])
+    cursor = myDb.cursor()
+    cursor.execute(sql)
+    df = pd.DataFrame(cursor.fetchall())
+    cursor.close()
+    
+    # adding a new column called datetime that combines date and time columns
+    df[0] = pd.to_datetime(df[0])
+    df['dateTime'] = df[0] + df[1]
+    
+    # calculate total time difference btween both datetimes
+    difference = datetime.fromisoformat(dateTimeEnd) - datetime.fromisoformat(dateTimeStart)
+    # divide this difference by the interval count
+    intervalSize = difference/intervalCount
+    # add this difference to datetime start and average all temp values within this range
+    result = {}
+    lowerBound = datetime.fromisoformat(dateTimeStart)
+    upperBound = lowerBound + intervalSize
+    
+    for i in range(0, intervalCount):
+        dfInterval = df.loc[(df['dateTime'] >= lowerBound) & (df['dateTime'] < upperBound), 2]
+        result[i] = (dfInterval.mean(), dfInterval.shape[0])
+        lowerBound = upperBound
+        upperBound = upperBound + intervalSize
+    # print(result)
+    
+    
+    return jsonify(result)
+
+    # Last 1 hour of temp date query
+    # select * from thermData where TIMESTAMP(`Date`, `Time`) >= date_sub(now(),interval 1 hour) ORDER BY `Date` DESC, `Time` DESC
+
+
 
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
