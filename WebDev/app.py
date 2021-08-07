@@ -6,8 +6,6 @@ from flask_mqtt import Mqtt
 
 from datetime import datetime
 import pandas as pd
-from pandas.core.algorithms import diff
-
 # from Scheduler import Scheduler
 
 
@@ -135,7 +133,6 @@ def historicalTemp():
         lowerBound = upperBound
         upperBound = upperBound + intervalSize
     # print(result)
-    
     
     return jsonify(result)
 
