@@ -410,13 +410,14 @@ demo = {
 
       endDateTime = endDateTime.format('YYYY-MM-DD HH:mm:ss');
       startDateTime = startDateTime.format('YYYY-MM-DD HH:mm:ss');
+      temps = [];
       
       $.ajax({
         url: '/api/historicalTemp?startDateTime='+ startDateTime + '&endDateTime=' + endDateTime + '&intervals=' + intervals,
         type: "GET",
         dataType: 'json',
         success: function(result) {
-          temps = [];
+          // temps = [];
           counts = [];
           for (const key in result) {
             temps.push(result[key][0]);
@@ -432,7 +433,8 @@ demo = {
         },
         error: function(xhr, status, error) {
           var err = eval("(" + xhr.responseText + ")");
-          console.log(err.Message);
+          console.log(err);
+          console.log("Some data may be missing, using default data.");
         }
       })
     }

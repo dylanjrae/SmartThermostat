@@ -175,12 +175,12 @@ $(document).ready(function() {
           pointHoverRadius: 4,
           pointHoverBorderWidth: 15,
           pointRadius: 4,
-          data: [100, 70, 90, 70, 85, 60, 75, 60, 90, 80, 110, 100],
+          data: [22, 23, 24, 25, 24, 23, 22, 23, 24, 25, 24, 23],
       }]
     };
 
     var dataBarChart = {
-      labels: ['USA', 'GER', 'AUS', 'UK', 'RO', 'BR'],,
+      labels: ['USA', 'GER', 'AUS', 'UK', 'RO', 'BR'],
       datasets: [{
         label: "Countries",
         fill: true,
@@ -194,7 +194,8 @@ $(document).ready(function() {
       }]
     };
 
-    function generateTwelveHourChart(ctx, settings) {
+
+    function prepareTwelveHourChart(ctx, settings) {
       //request for data
       //on success call function that actually creates chart
       var endDateTime = dayjs();
@@ -208,40 +209,213 @@ $(document).ready(function() {
         type: "GET",
         dataType: 'json',
         success: function(result) {
-          //prepare data
-          //error handling if it returns no data
-          //assign new data to settings
-          //pass info to create chart to have it made
-          //createChart(ctx, settings);
-          //on error still create chart but with default data
-
+          //prepare and extract data from JSON
           temps = [];
           counts = [];
           for (const key in result) {
             temps.push(result[key][0]);
             counts.push(result[key][1]);
 
-            console.log(`${key} : ${result[key][0]}`);
+            // console.log(`${key} : ${result[key][0]}`);
           }
-          console.log(temps);
-          console.log(counts);
-          twelveHourChart.data.datasets[0].data = temps;
-          twelveHourChart.update();
-          return temps;
+          // console.log(temps);
+          // console.log(counts);
+
+          //assign new data to chart settings
+          settings.data.datasets[0].data = temps;
+          //create chart
+          var chart = new Chart(ctx, settings);
+          return chart;
         },
         error: function(xhr, status, error) {
+          //If error log message and use default data
           var err = eval("(" + xhr.responseText + ")");
-          console.log(err.Message);
+          console.log(err);
+          console.log("Some data may be missing for 12 hour, using default data.");
+          var chart = new Chart(ctx, settings);
+          return chart;
         }
       })
     }
 
-    generateTwelveHourChart(ctxTwelveHour, {
-      type: 'line',
-      data: dataTwelveHour,
-      options: gradientChartOptionsConfigurationWithTooltipPurple
-    });
+    function prepareDayWeekMonthChart(ctx, settings) {
+      //request for data
+      //on success call function that actually creates chart
+      
+      var tempsDay = [];
+      var countsDay = [];
+      var dayLabels = ['-24hr', '-22hr', '-20hr', '-18hr', '-16hr', '-14hr', '-12hr', '-10hr', '-8hr', '-6hr', '-4hr', '-2hr'];
+      var tempsWeek = [];
+      var countsWeek = [];
+      var weekLabels = ['-7d', '-6d', '-5d', '-4d', '-3d', '-2d', '-1d'];
+      var tempsMonth = [];
+      var countsMonth = [];
+      var monthLabels = ['-30', '-29', '-28', '-27', '-26', '-25', '-24', '-23', '-22', '-21', '-20', '-19', '-18', '-17', '-16', '-15', '-14', '-13', '-12', '-11', '-10', '-9', '-8', '-7', '-6', '-5', '-4', '-3', '-2', '-1'];
+      var endDateTime = dayjs();
+      var startDateTime = endDateTime.subtract(24, 'hour');
 
-    generateDayWeekMonthChart();
-    generateSetTempHistoryChart();
+      endDateTime = endDateTime.format('YYYY-MM-DD HH:mm:ss');
+      startDateTime = startDateTime.format('YYYY-MM-DD HH:mm:ss'); 
+
+      $.ajax({
+        url: '/api/historicalTemp?startDateTime='+ startDateTime + '&endDateTime=' + endDateTime + '&intervals=' + 12,
+        type: "GET",
+        dataType: 'json',
+        success: function(result) {
+          //prepare and extract data from JSON
+          for (const key in result) {
+            tempsDay.push(result[key][0]);
+            countsDay.push(result[key][1]);
+            // console.log(`${key} : ${result[key][0]}`);
+          }
+          //assign new data to chart settings
+          settings.data.datasets[0].data = tempsDay;
+        },
+        error: function(xhr, status, error) {
+          //If error log message and use default data
+          var err = eval("(" + xhr.responseText + ")");
+          console.log(err);
+          console.log("Some data may be missing for 24 hour, using default data.");
+          tempsDay = [22, 23, 24, 25, 24, 23, 22, 23, 24, 25, 24, 23];
+        },
+        complete: function() {
+          //create chart
+          var chart = new Chart(ctx, settings);
+          //get day params for week ajax
+          endDateTime = dayjs();
+          startDateTime = endDateTime.subtract(1, 'week');
+          endDateTime = endDateTime.format('YYYY-MM-DD HH:mm:ss');
+          startDateTime = startDateTime.format('YYYY-MM-DD HH:mm:ss'); 
+          $.ajax({
+            url: '/api/historicalTemp?startDateTime='+ startDateTime + '&endDateTime=' + endDateTime + '&intervals=' + 7,
+            type: "GET",
+            dataType: "json",
+            success: function(result) {
+              //prepare and extract data from JSON
+              for (const key in result) {
+                tempsWeek.push(result[key][0]);
+                countsWeek.push(result[key][1]);
+                // console.log(`${key} : ${result[key][0]}`);
+              }
+            },
+            error: function(xhr, status, error) {
+              //If error log message and use default data
+              var err = eval("(" + xhr.responseText + ")");
+              console.log(err);
+              console.log("Some data may be missing for 1 week, using default data.");
+              tempsWeek = [22, 24, 22, 26, 27, 23, 24];
+            },
+            complete: function() {
+              endDateTime = dayjs();
+              startDateTime = endDateTime.subtract(1, 'month');
+              endDateTime = endDateTime.format('YYYY-MM-DD HH:mm:ss');
+              startDateTime = startDateTime.format('YYYY-MM-DD HH:mm:ss'); 
+              $.ajax({
+                url: '/api/historicalTemp?startDateTime='+ startDateTime + '&endDateTime=' + endDateTime + '&intervals=' + 30,
+                type: "GET",
+                dataType: "json",
+                success: function(result) {
+                  //prepare and extract data from JSON
+                  for (const key in result) {
+                    tempsMonth.push(result[key][0]);
+                    countsMonth.push(result[key][1]);
+                    // console.log(`${key} : ${result[key][0]}`);
+                  }
+                },
+                error: function(xhr, status, error) {
+                  //If error log message and use default data
+                  var err = eval("(" + xhr.responseText + ")");
+                  console.log(xhr.responseText);
+                  console.log("Some data may be missing for 1 month, using default data.");
+                  tempsMonth = [22, 23, 24, 25, 24, 23, 22, 23, 24, 25, 24, 23, 24, 25, 24, 23, 22, 23, 24, 25, 24, 23, 24, 25, 24, 23, 22, 23, 24, 25, 24, 23];
+                }
+              })
+            }
+          })
+
+          $("#0").click(function() {
+            var data = chart.config.data;
+            data.datasets[0].data = tempsDay;
+            data.labels = dayLabels;
+            chart.update();
+          });
+
+          $("#1").click(function() {
+            var data = chart.config.data;
+            data.datasets[0].data = tempsWeek;
+            data.labels = weekLabels;
+            chart.update();
+          });
+
+          $("#2").click(function() {
+            var data = chart.config.data;
+            data.datasets[0].data = tempsMonth;
+            data.labels = monthLabels;
+            chart.update();
+          });
+        }
+      })
+    }
+
+    // function updateDayChart(chart) {
+    //     //request for data
+    //     //on success call function that actually creates chart
+    //     var endDateTime = dayjs();
+    //     var startDateTime = endDateTime.subtract(24, 'hour');
+  
+    //     endDateTime = endDateTime.format('YYYY-MM-DD HH:mm:ss');
+    //     startDateTime = startDateTime.format('YYYY-MM-DD HH:mm:ss');
+  
+    //     $.ajax({
+    //       url: '/api/historicalTemp?startDateTime='+ startDateTime + '&endDateTime=' + endDateTime + '&intervals=' + 12,
+    //       type: "GET",
+    //       dataType: 'json',
+    //       success: function(result) {
+    //         //prepare and extract data from JSON
+    //         temps = [];
+    //         counts = [];
+    //         for (const key in result) {
+    //           temps.push(result[key][0]);
+    //           counts.push(result[key][1]);
+  
+    //           // console.log(`${key} : ${result[key][0]}`);
+    //         }
+    //         // console.log(temps);
+    //         // console.log(counts);
+  
+    //         //assign new data to chart settings
+    //         console.log(chart);
+    //         chart.datasets[0].data = temps;
+    //         chart.settings.data.labels = ['-24hr', '-22hr', '-20hr', '-18hr', '-16hr', '-14hr', '-12hr', '-10hr', '-8hr', '-6hr', '-4hr', '-2hr'];
+    //         chart.update();
+    //       },
+    //       error: function(xhr, status, error) {
+    //         //If error log message and use default data
+    //         var err = eval("(" + xhr.responseText + ")");
+    //         console.log(err);
+    //         console.log("Some data may be missing for 24 hour chart, using default data.");
+    //         console.log(chart);
+
+    //         chart.datasets[0].data = [22, 23, 24, 25, 24, 23, 22, 23, 24, 25, 24, 23];
+    //         chart.settings.data.labels = ['-24hr', '-22hr', '-20hr', '-18hr', '-16hr', '-14hr', '-12hr', '-10hr', '-8hr', '-6hr', '-4hr', '-2hr'];
+    //         chart.update();
+    //       }
+    //     })
+    //   }
+
+    
+    var twelveHourChart = prepareTwelveHourChart(ctxTwelveHour, {
+                            type: 'line',
+                            data: dataTwelveHour,
+                            options: gradientChartOptionsConfigurationWithTooltipPurple
+                          });
+
+    var dayWeekMonthChart = prepareDayWeekMonthChart(ctxHistoricalChart, {
+                              type: 'line',
+                              data: dataHistorical,
+                              options: gradientChartOptionsConfigurationWithTooltipPurple
+                            });
+
+
+    // generateSetTempHistoryChart();
 });

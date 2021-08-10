@@ -129,7 +129,12 @@ def historicalTemp():
     
     for i in range(0, intervalCount):
         dfInterval = df.loc[(df['dateTime'] >= lowerBound) & (df['dateTime'] < upperBound), 2]
-        result[i] = (dfInterval.mean(), dfInterval.shape[0])
+        samplePointCount = dfInterval.shape[0]
+        if(samplePointCount == 0):
+            aveTemp = 21.69
+        else:
+            aveTemp = dfInterval.mean()
+        result[i] = (aveTemp, samplePointCount)
         lowerBound = upperBound
         upperBound = upperBound + intervalSize
     # print(result)
