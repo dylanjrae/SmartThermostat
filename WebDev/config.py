@@ -13,8 +13,8 @@ class ProdConfig(Config):
 
 
 class DevConfig(Config):
-    DEBUG = True
-    TESTING = True
+    DEBUG = False
+    TESTING = False
 
     # Datebase
     MYSQL_HOST = '10.0.0.69'
