@@ -17,6 +17,7 @@ $(document).ready(function() {
 
 
 
+
       $('.fixed-plugin a').click(function(event) {
         if ($(this).hasClass('switch-trigger')) {
           if (event.stopPropagation) {

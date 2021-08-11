@@ -40,6 +40,14 @@ mqtt.subscribe("therm/DATA")
 def index():
     return render_template('index.html')
 
+@app.route('/schedule')
+def schedule():
+    return render_template('schedule.html')
+
+@app.route('/api-details')
+def apiDetails():
+    return render_template('api-details.html')
+
 @app.route('/api/currentStatus', methods=['GET'])
 def currentStatus():
     # Connecting to db and getting most recent record
