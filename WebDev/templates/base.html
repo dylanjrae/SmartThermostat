@@ -168,23 +168,26 @@
                         </div>
                       </li>
 
-
                       <li class="dropdown nav-item">
                         <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
                           <div class="photo">
                             <img src="{{ url_for('static', filename='img/anime3.png') }}" alt="Profile Photo">
                           </div>
                           <b class="caret d-none d-lg-block d-xl-block"></b>
-                          <p class="d-lg-none">
+                          <!-- <p class="d-lg-none">
                             Log out
-                          </p>
+                          </p> -->
                         </a>
                         <!-- Mobile view toggle -->
                         <ul class="dropdown-menu dropdown-navbar">
-                          <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Profile</a></li>
+                          <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item" id="logInBtn">Login</a></li>
+                          
+
+
+
                           <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Settings</a></li>
                           <li class="dropdown-divider"></li>
-                          <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Log out</a></li>
+                          <li class="nav-link"><a href="{{ url_for('logout') }}" class="nav-item dropdown-item">Log out</a></li>
                         </ul>
                       </li>
                       <li class="separator d-lg-none"></li>
@@ -205,6 +208,31 @@
                 </div>
               </div>
               <!-- End Navbar -->
+
+              <!-- Login overlay and form -->
+              <!-- overlay shouldnt be fixed so you can scroll down and it stays centered -->
+              <!-- https://stackoverflow.com/questions/9280258/prevent-body-scrolling-but-allow-overlay-scrolling -->
+              <div id="ovrly">
+                <div id="login" class="card-body">
+                    <button id="cross">X</button>
+                    <h3>Please log in to change settings.</h3>
+                    <form action = "{{ url_for('login_post') }}" method="POST">
+                        <input type="text" placeholder="Email" class="txt" name="email"/>
+                        <input type="password" placeholder="Password" class="pswd" name="password"/>
+                        <label for="logbut">Remember me?</label>
+                        <input type="checkbox" checked="checked" name="remember" id="logbut"/>
+                        <!-- <input type="button" class="temp-button btn btn-primary btn-round"LogIn" id="btn"/> -->
+                        <div class="row justify-conent-center">
+                          <div class="col-lg-12">
+                            
+                            <button type="submit" class="login-button btn btn-primary btn-round">Login</button>
+                          </div>
+                        </div>
+                        
+                    </form>
+                    <p>Sign up not available for security purposes. Contact Dylan to set up an account.</p>
+                </div>
+              </div>
         
         {% block body %}{% endblock %}
         
@@ -241,6 +269,7 @@
         <!-- Core JS Files -->
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="{{ url_for('static', filename='js/core/jquery.js') }}">\x3C/script>')</script>
+
         <script src="{{ url_for('static', filename='js/core/popper.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/core/bootstrap.min.js') }}" ></script>
         
@@ -258,7 +287,19 @@
         <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
         <script src="{{ url_for('static', filename='js/appearance.js') }}"></script>
 
-        <script defer async type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+                <!-- call the function in main with a boolean for indicating if the user is logged in or not -->
+        <!-- <script defer async type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script> -->
+        <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+        <script>
+          // mainFunc({{ current_user.is_authenticated }})
+          {% if current_user.is_authenticated %}
+            mainFunc(true);
+          {% else %}
+            mainFunc(false);
+          {% endif %}
+        </script>
+
+        
         
         
         <!-- <script>

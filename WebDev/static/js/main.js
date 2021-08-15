@@ -1,8 +1,9 @@
-$(document).ready(function() {
-    $().ready(function() {
+// $(document).ready(function() {
+function mainFunc(isLoggedIn) {
+    // $().ready(function() {
         "use strict";
         
-// *********UPDATING DATA METRICS*******************
+        // *********UPDATING DATA METRICS*******************
         // var basePath = "http://10.0.0.69/smartTherm"; //For production deployment DEBUG=False, Testing = True
         // var basePath = "http://70.72.206.93/"; 
         // var basePath = "http://smarttherm.dylanrae.ca"; 
@@ -57,53 +58,65 @@ $(document).ready(function() {
                 }
             })
         }
-
-        $("#setTempForm").submit(function(event) {
-            event.preventDefault();
-
-            if (request) {
-                request.abort();
-            }
-
-            var $form = $(this);
-            var $inputs = $form.find("input, select, buttom, textarea");
-
-            var serializedData = $form.serialize();
-
-            $inputs.prop("disabled", true);
-
-            request = $.ajax({
-                url: basePath + "/api/setTemp",
-                type: "POST",
-                data: serializedData
-            });
-
-            // Callback handler that will be called on success
-            request.done(function (response, textStatus, jqXHR){
-                // Log a message to the console
-                console.log("Hooray, it worked!");
-                $("#setTempResult").text("Success! Allow up to 1min for the change to be seen system wide.")
-            });
-
-            // Callback handler that will be called on failure
-            request.fail(function (jqXHR, textStatus, errorThrown){
-                // Log the error to the console
-                console.error(
-                    "The following error occurred: "+
-                    textStatus, errorThrown
-                );
-                $("#setTempResult").text("There was an error sending the new temperature.")
-            });
-
-            // Callback handler that will be called regardless
-            // if the request failed or succeeded
-            request.always(function () {
-                // Reenable the inputs
-                $inputs.prop("disabled", false);
-            });
-        })
+        if(isLoggedIn) {
+            $("#setTempForm").submit(function(event) {
+                event.preventDefault();
+    
+                if (request) {
+                    request.abort();
+                }
+    
+                var $form = $(this);
+                var $inputs = $form.find("input, select, buttom, textarea");
+    
+                var serializedData = $form.serialize();
+    
+                $inputs.prop("disabled", true);
+    
+                request = $.ajax({
+                    url: basePath + "/api/setTemp",
+                    type: "POST",
+                    data: serializedData
+                });
+    
+                // Callback handler that will be called on success
+                request.done(function (response, textStatus, jqXHR){
+                    // Log a message to the console
+                    console.log("Hooray, it worked!");
+                    $("#setTempResult").text("Success! Allow up to 1min for the change to be seen system wide.")
+                });
+    
+                // Callback handler that will be called on failure
+                request.fail(function (jqXHR, textStatus, errorThrown){
+                    // Log the error to the console
+                    console.error(
+                        "The following error occurred: "+
+                        textStatus, errorThrown
+                    );
+                    $("#setTempResult").text("There was an error sending the new temperature.")
+                });
+    
+                // Callback handler that will be called regardless
+                // if the request failed or succeeded
+                request.always(function () {
+                    // Reenable the inputs
+                    $inputs.prop("disabled", false);
+                });
+            })
+        }
+    
+        else {
+            
+        }
+        //if you are logged in the below happens,
+        // else: call the function that pulls up the login screen currentyl. Make the samenthin happen but just for another button.
+        
         
         getCurrentStatus();
         setInterval(getCurrentStatus, 10000);
-    });
-});
+    // });
+
+    
+}
+    
+// });

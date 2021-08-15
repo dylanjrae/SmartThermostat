@@ -5196,6 +5196,10 @@ input[type="button"].btn-block {
   padding: 1.5rem;
 }
 
+.card-body.dialpadding {
+  padding-top: 0px;
+}
+
 .card-title {
   margin-bottom: 1.25rem;
 }
@@ -17142,6 +17146,88 @@ table.tablesorter thead tr .headerSortDown {
   min-height: inherit;
 }
 
+#logInBtn {
+	/* background-color: #2ecc71;
+	border: none;
+	padding: 7px;
+	color: #fff;
+	margin: 20px;
+	border-radius: 5px;
+	font-size: 16 */
+  width: 20%;
+}
+
+#logInBtn:hover {
+	/* background-color: #fff;
+	color: #2ecc71;
+	border: 2px solid #2ecc71 */
+}
+
+#ovrly{
+	background-color: rgba(0, 0, 0, 0.7);
+	height: 100%;
+	width: 100%;
+	position: fixed;
+	top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  z-index: 9999; /* To put it on top of everything*/
+}
+
+#login {
+	background-color: #27293C;
+	width: 50%;
+	margin: auto;
+	border: 3px solid #C051B1;
+	border-radius: 10px;
+	padding: 20px;
+	text-align: center;
+	position: relative;
+	top: -400px;
+  z-index: 9999;/* To put it on top of everything*/
+}
+
+#ovrly,#login{
+  display: none;
+}
+
+#cross{
+	position: absolute;
+    left: 93%;
+    top: 10px;
+    color: red;
+	font-size: 18;
+	font-weight: bold;
+	background-color: transparent;
+	border: 0
+}
+
+/* h1{
+  margin-top: 0px
+} */
+
+form,input[type="button"]{margin:0 !important}
+
+.txt,.pswd{
+	background-color: #fff;
+	display: block;
+	border: 2px solid #C051B1;
+	border-radius: 10px;
+	padding: 5px;
+	margin: auto;
+	margin-bottom: 15px;
+  width: 30%;
+}
+
+
+.login-button {
+  margin-top: 8px;
+  margin-bottom: 30px;
+
+}
+
+
 #setTempForm {
   display: block;
   text-align: center;
@@ -17152,12 +17238,13 @@ table.tablesorter thead tr .headerSortDown {
 
 }
 
+/* Need to remove padding around card-body element sfor the square with th ebutton */
+
+
 #knob {
   width: 130px; /*needs to be same as width created in js*/
   margin: auto;
 }
-
-
 
 
 .blob {/* .furnace-status-icon { */

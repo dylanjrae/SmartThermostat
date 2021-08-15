@@ -27,7 +27,7 @@
             <h5 class="card-category">Current Set Temperature</h5>
             <h3 class="card-title"><i class="fas fa-bullseye text-info"></i> <span id=setTemp></span> <span>&#176;</span>C</h3>
           </div>
-          <div class="card-body">
+          <div class="card-body dial-padding">
             <div class="chart-area">
               <div class="setTempCard">
                   <div id="knob"></div>
@@ -136,6 +136,34 @@
           </div>
           <div class="card-body">
               <h1>Coming Soon!</h1>
+              <!-- {% if get_flashed_messages() %}
+                <p>MESSAGE PRESENT</p>
+              {% endif %} -->
+              <!-- If there are messages, create a script tag with an alert for the message -->
+              {% with messages = get_flashed_messages() %}
+              <p>IN WITH</p>
+                {% if messages %}
+                <p>IN IF</p>
+                  {% for message in messages %}
+                  <p>IN FOR</p>
+                    <script>
+                      alert(" {{ message|safe }} ")
+                    </script>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+
+              {% if current_user.is_authenticated %}
+                 <p>You are currently logged in!</p>
+              {% else %}
+                 <p>You are not logged in.</p>
+              {% endif %}
+
+              <hr>
+
+
+
+
               <div class="chart-area">
                 <canvas id="chartLineGreen"></canvas>
               </div>
@@ -144,6 +172,8 @@
       </div>
     </div>
   </div>
+
+  
 
 
     <!-- <h1>Nuthouse SmartTherm</h1>

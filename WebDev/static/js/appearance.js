@@ -17,6 +17,22 @@ $(document).ready(function() {
 
 
 
+      // Login javascript overlay
+      window.$("#logInBtn").click(function () {
+        "use strict";
+        window.$("#ovrly").fadeIn();
+        window.$("#login").show();
+        window.$("#login").animate({top: "250"});
+      });
+
+
+      window.$("#cross").click(function () {
+        "use strict";
+        window.$("#ovrly").hide();
+        window.$("#login").hide();
+        window.$("#login").css("top", "-310px");
+      });
+
 
       $('.fixed-plugin a').click(function(event) {
         if ($(this).hasClass('switch-trigger')) {

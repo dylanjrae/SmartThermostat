@@ -5,17 +5,9 @@
 class Config:
     STATIC_FOLDER = 'static'
     TEMPLATES_FOLDER = 'templates'
-
-class ProdConfig(Config):
-    DEBUG = False
-    TESTING = False
-
-
-
-class DevConfig(Config):
-    DEBUG = False
-    TESTING = False
-
+    
+    SECRET_KEY = 'verySecretKey'
+    
     # Datebase
     MYSQL_HOST = '10.0.0.69'
     MYSQL_USER = 'root'
@@ -23,6 +15,10 @@ class DevConfig(Config):
     MYSQL_DB = 'tempLog'
     MYSQL_PORT = 3306
     # MYSQL_CURSORCLASS = ''
+    
+    # SQLAlchemy
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:pmwpmwpmw@10.0.0.69/tempLog'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # MQTT
     MQTT_CLIENT_ID = "WebApp"
@@ -32,3 +28,15 @@ class DevConfig(Config):
     MQTT_PASSWORD = ''
     MQTT_KEEPALIVE = 20
     MQTT_TLS_ENABLED = False
+
+class ProdConfig(Config):
+    DEBUG = False
+    TESTING = False
+
+
+
+class DevConfig(Config):
+    DEBUG = True
+    TESTING = True
+
+    

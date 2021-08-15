@@ -1,16 +1,29 @@
 
-from flask import Flask, render_template, jsonify, request #, url_for, request, redirect
+from os import name
+from flask import Flask, render_template, url_for, jsonify, request, redirect, flash #, url_for, request, redirect
+from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user
+from flask_sqlalchemy import SQLAlchemy
 # from flask_mysqldb import MySQL #FOR SOMEREASON THIS CAN'T WORK IN A FUNCTION WITH A MQTT DECORATOR
 import mysql.connector
 from flask_mqtt import Mqtt
 
 from datetime import datetime
 import pandas as pd
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import DataRequired
 # from Scheduler import Scheduler
 
 
 app = Flask(__name__)
-app.config.from_object('config.DevConfig')
+app.config.from_object('config.ProdConfig')
+
+db = SQLAlchemy(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
 # mysqlDb = MySQL(app)
 mqtt = Mqtt(app)
 mqtt.subscribe("therm/DATA")
@@ -38,6 +51,7 @@ mqtt.subscribe("therm/DATA")
 # then try and see if it works on apache to trrouble shoot
 @app.route('/')
 def index():
+    # flash('Welcome!')
     return render_template('index.html')
 
 @app.route('/schedule')
@@ -102,6 +116,8 @@ def setTemp():
 # endDateTime --> starting date and time for temp data in the format YYYY-MM-DD HH:MM:SS
 # intervals --> number of intervals to average the data over
 # returns averaged temps for number of points specified from past (0) to present (intervals-1)
+
+# Should enforce paramter name/type
 @app.route('/api/historicalTemp', methods=['GET'])
 def historicalTemp():
     # recevies time stamps for desired interval
@@ -139,6 +155,7 @@ def historicalTemp():
         dfInterval = df.loc[(df['dateTime'] >= lowerBound) & (df['dateTime'] < upperBound), 2]
         samplePointCount = dfInterval.shape[0]
         if(samplePointCount == 0):
+            # Should come up with something better to do if it is 0
             aveTemp = 21.69
         else:
             aveTemp = dfInterval.mean()
@@ -151,6 +168,81 @@ def historicalTemp():
 
     # Last 1 hour of temp date query
     # select * from thermData where TIMESTAMP(`Date`, `Time`) >= date_sub(now(),interval 1 hour) ORDER BY `Date` DESC, `Time` DESC
+
+class User(db.Model, UserMixin):
+    __tablename__ = 'accounts'
+    
+    # def __init__(self, id, email, name, password):
+    #     self.id = id
+    #     self.email = email
+    #     self.name = name
+    #     self.password = password
+    
+    id = db.Column(db.Integer, primary_key = True)
+    email = db.Column(db.String(100), unique=True)
+    name = db.Column(db.String(50))
+    password_hash = db.Column(db.String(255))
+    
+    def set_password(self,password):
+        self.password_hash = generate_password_hash(password)
+     
+    def check_password(self,password):
+        return check_password_hash(self.password_hash, password)
+    
+    def __repr__(self):
+        return '<ID: {}, Name: {}, Email: {}>'.format(self.id, self.name, self.email)
+    
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember_me = BooleanField('Remember Me')
+    # submit = SubmitField('Sign In')
+
+# Something to do with alchemy pulling from the wrong table name
+# accounts = User.query.filter_by(id=1).first()
+# print(accounts)
+
+# u = User(email='dylan.rae@eecol.com', name='DOG')
+# u.set_password('dawg')
+# db.session.add(u)
+# db.session.commit()
+# print(generate_password_hash('test'))
+
+# Need to make a form on site to test, and redirect to index if it works
+@app.route('/login', methods=['GET', 'POST'])
+def login_post():
+    if current_user.is_authenticated:
+        print("User already logged in!")
+        flash("You are already logged in!")
+        return redirect(url_for('index'))
+    
+    form = LoginForm()
+    
+    print("Email: {}, Password: {}, Remember: {}", form.email.data, form.password.data, form.remember_me.data)
+    # if form.validate_on_submit():
+    user = User.query.filter_by(email=form.email.data).first()
+    print(user)
+    if user is None or not user.check_password(form.password.data):
+        print("here!")
+        flash('Invalid email or password!')
+        # return redirect(url_for('index'))
+        return redirect('/')
+    
+    login_user(user, remember = form.remember_me.data)
+    flash('Login Successful!')
+    return redirect(url_for('index'))
+    # return render_template('login.html', title='Sign In', form=form)
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    flash('You have been logged out successfully!')
+    return redirect(url_for('index'))
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 
 
 
