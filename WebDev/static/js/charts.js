@@ -119,7 +119,7 @@ $(document).ready(function() {
     //Selecting html elements for the charts
     var ctxTwelveHour = document.getElementById("chartLinePurple").getContext("2d");
     var ctxHistoricalChart = document.getElementById("chartBig1").getContext('2d');
-    var ctxBarChart = document.getElementById("CountryChart").getContext("2d");
+    // var ctxBarChart = document.getElementById("CountryChart").getContext("2d");
 
     //applying gradients to the chart elements
     var gradientStroke = ctxTwelveHour.createLinearGradient(0, 230, 0, 50);
@@ -132,10 +132,10 @@ $(document).ready(function() {
     gradientStroke.addColorStop(0.2, 'rgba(72,72,176,0.0)');
     gradientStroke.addColorStop(0, 'rgba(119,52,169,0)'); //purple colors
 
-    gradientStroke = ctxBarChart.createLinearGradient(0, 230, 0, 50);
-    gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
-    gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
-    gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
+    // gradientStroke = ctxBarChart.createLinearGradient(0, 230, 0, 50);
+    // gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
+    // gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
+    // gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
 
     var dataTwelveHour = {
       labels: ['-12hr', '-10hr', '-8hr', '-6hr', '-4hr', '-2hr'],

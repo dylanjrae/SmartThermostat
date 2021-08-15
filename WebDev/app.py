@@ -88,7 +88,10 @@ def currentStatus():
 @app.route('/api/setTemp', methods=['POST'])
 def setTemp():
     #default user is root, but in future will be diferent (ie Guest, djohnjames, etc.)
-    userID = app.config['MYSQL_USER']
+    # userID = app.config['MYSQL_USER']
+    userID = current_user.id
+    print(userID)
+    
     # Get new temperature from form that was sent
     newTemp = request.form["newSetTemp"]
 
@@ -166,8 +169,34 @@ def historicalTemp():
     
     return jsonify(result)
 
-    # Last 1 hour of temp date query
-    # select * from thermData where TIMESTAMP(`Date`, `Time`) >= date_sub(now(),interval 1 hour) ORDER BY `Date` DESC, `Time` DESC
+# startDateTime --> starting date and time for temp data in the format YYYY-MM-DD HH:MM:SS
+# endDateTime --> starting date and time for temp data in the format YYYY-MM-DD HH:MM:SS
+# returns records of all set temps within specified date range
+
+# Should enforce paramter name/type
+@app.route('/api/historicalSetTemp', methods=['GET'])
+def historicalSetTemp():  
+    args = request.args
+    # print(args)
+    
+    dateTimeStart = args["startDateTime"]
+    dateTimeEnd = args["endDateTime"]
+    
+    sql = "SELECT a.Date, a.Time, b.Name, a.setTemp FROM setTempLog a RIGHT JOIN accounts b ON a.UserID=b.id WHERE TIMESTAMP(a.Date, a.Time) >= '" + dateTimeStart + "' AND  TIMESTAMP(a.Date, a.Time) < '" + dateTimeEnd + "' ORDER BY a.Date DESC, a.Time DESC"
+
+    myDb = mysql.connector.connect(host=app.config['MYSQL_HOST'],user=app.config['MYSQL_USER'],port=app.config['MYSQL_PORT'], password=app.config['MYSQL_PASSWORD'],database=app.config['MYSQL_DB'])
+    cursor = myDb.cursor()
+    cursor.execute(sql)
+    df = pd.DataFrame(cursor.fetchall())
+    cursor.close()
+    # print(df)
+    df[0] = pd.to_datetime(df[0])
+    df[0] = df[0].dt.strftime('%Y-%m-%d')
+    df[1] = df[1].astype(str).str[7:]
+    result = df.to_json(orient="records")
+
+    return result
+    
 
 class User(db.Model, UserMixin):
     __tablename__ = 'accounts'

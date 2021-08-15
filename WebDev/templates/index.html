@@ -120,12 +120,31 @@
         <div class="card card-chart">
           <div class="card-header">
             <h5 class="card-category">Set Temperature History</h5>
-            <h3 class="card-title"><i class="fas fa-bullseye text-info"></i> <span class=setTemp></span> <span>&#176;</span>C</h3>
+            <h3 class="card-title"><i class="fas fa-bullseye text-info"></i> <span class=setTemp></span>Set Temperature Records</h3>
           </div>
-          <div class="card-body">
-            <div class="chart-area">
-              <canvas id="CountryChart"></canvas>
+          <div class="card-body temp-history">
+            
+            
+            <div class="table-responsive">
+              <table class="table tablesorter">
+
+                <thead class=" text-primary">
+                  <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Name</th>
+                    <th class="text-center">Set Temperature</th>
+                  </tr>
+                </thead>
+                <tbody id="setTempTable">
+                </tbody>
+              </table>
             </div>
+
+
+            <!-- <div class="chart-area">
+              <canvas id="CountryChart"></canvas>
+            </div> -->
           </div>
         </div>
       </div>
