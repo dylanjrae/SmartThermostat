@@ -6,52 +6,130 @@
 
 {% block body %}
 <div class="content">
-    
-    <!-- temp trend graph -->
-    <div class="row">
-      <div class="col-12">
-        <div class="card card-chart">
-          <div class="card-header ">
-            <div class="row">
-              <div class="col-sm-6 text-left">
-                <h5 class="card-category">Temperature Schedule</h5>
-                <h2 class="card-title">Schedule with Preheating Coming Soon!</h2>
-              </div>
-              <div class="col-sm-6">
-                <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
-                  <label class="btn btn-sm btn-primary btn-simple active" id="0">
-                    <input type="radio" name="options" checked>
-                    <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Day</span>
-                    <span class="d-block d-sm-none">
-                      <i class="fas fa-calendar-day"></i>
-                    </span>
-                  </label>
-                  <label class="btn btn-sm btn-primary btn-simple" id="1">
-                    <input type="radio" class="d-none d-sm-none" name="options">
-                    <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Week</span>
-                    <span class="d-block d-sm-none">
-                      <i class="fas fa-calendar-week"></i>
-                    </span>
-                  </label>
-                  <label class="btn btn-sm btn-primary btn-simple" id="2">
-                    <input type="radio" class="d-none" name="options">
-                    <span class="d-none d-sm-block d-md-block d-lg-block d-xl-block">Month</span>
-                    <span class="d-block d-sm-none">
-                      <i class="far fa-calendar"></i>
-                    </span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="chart-area">
-              <canvas id="chartBig1"></canvas>
+  <div class="row">
+    <div class="col-lg-6 col-sm-12">
+      <div class="card card-chart">
+        <div class="card-header">
+          <div class="row">
+            <div class="col-lg-12 text-left">
+              <h5 class="card-category">Temperature Schedule</h5>
+              <h2 class="card-title">Set Schedule</h2>
             </div>
           </div>
         </div>
+        <div class="card-body">
+          <!-- Need to make a form to enter the time and temperature you want scheduled -->
+          <!-- Should take over the functionality of this with an ajax request and jquery to customie results before sending them out -->
+          <!-- Need to format better -->
+          <form id="setScheduleForm" action = "{{ url_for('setScheduleTemp') }}" method="GET">
+            <label for="scheduleTime">Time:</label>
+            <input type="time" id="scheduleTime" name="scheduleTime" required><br>
+            
+            <label for="scheduleTemp">Temperature:</label>
+            <input type="text" id="scheduleTemp" placeholder="Set Temperature"  name="setTemp" required/><br>
+
+            <label for="jobID">Schedule ID:</label>
+            <input type="text" id="jobID" placeholder="Unique ID"  name="jobID" required/><br>
+
+            <label for="preheat">Preheat?</label>
+            <input type="checkbox" checked="checked" name="remember" id="preheat"/>
+            <!-- <input type="button" class="temp-button btn btn-primary btn-round"LogIn" id="btn"/> -->
+            <div class="row justify-conent-center">
+              <div class="col-lg-12">
+                <button type="submit" id="setScheduleBtn" class="login-button btn btn-primary btn-round">Set Schedule</button>
+              </div>
+            </div>
+            
+          </form>
+
+
+        </div>
       </div>
     </div>
-  </div>
 
-{% endblock %}
+    <div class="col-lg-6 col-sm-12">
+      <div class="card card-chart">
+        <div class="card-header ">
+          <div class="row">
+            <div class="col-lg-12 text-left">
+              <h5 class="card-category">Temperature Schedule</h5>
+              <h2 class="card-title">Delete Schedule</h2>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form id="deleteScheduleForm" action = "{{ url_for('deleteScheduleTemp') }}" method="GET">
+
+            <label for="jobID">Schedule ID:</label>
+            <input type="text" id="jobID" placeholder="Unique ID"  name="jobID" required/><br>
+
+            <!-- <input type="button" class="temp-button btn btn-primary btn-round"LogIn" id="btn"/> -->
+            <div class="row justify-conent-center">
+              <div class="col-lg-12">
+                <button type="submit" id="setScheduleBtn" class="login-button btn btn-primary btn-round">Delete Schedule</button>
+              </div>
+            </div>
+            
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-12 col-sm-12">
+      <div class="card card-chart">
+        <div class="card-header ">
+          <div class="row">
+            <div class="col-lg-12 text-left">
+              <h5 class="card-category">Temperature Schedule</h5>
+              <h2 class="card-title">Current Schedule</h2>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <div class="table-responsive">
+            <table class="table tablesorter">
+
+              <thead class=" text-primary">
+                <tr>
+                  <th>Time</th>
+                  <th>Set Temp</th>
+                  <!-- <th>Pre Heat</th> -->
+                  <th class="alignRight">Schedule ID</th>
+                </tr>
+              </thead>
+              <tbody id="scheduleTable">
+
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                  {% for message in messages %}
+                    <script>
+                      alert(" {{ message|safe }} ")
+                    </script>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+            {% endblock %}
+
+{% block scripts %}
+          <script src="{{ url_for('static', filename='js/schedule.js') }}"></script>
+          <script>
+            // mainFunc({{ current_user.is_authenticated }})
+            {% if current_user.is_authenticated %}
+              mainFunc(true);
+            {% else %}
+              mainFunc(false);
+            {% endif %}
+          </script>
+{% endblock %} 

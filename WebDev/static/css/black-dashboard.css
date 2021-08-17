@@ -2045,7 +2045,7 @@ pre code {
 .table-responsive {
   display: block;
   max-height: 325px;
-  overflow-y: scroll;
+  overflow-y: auto;
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;

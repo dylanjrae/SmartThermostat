@@ -30,6 +30,7 @@
           <div class="card-body dial-padding">
             <div class="chart-area">
               <div class="setTempCard">
+                <!-- Replace dial with a recommended eco temperature -->
                   <div id="knob"></div>
 
                   <form id="setTempForm">
@@ -160,11 +161,11 @@
               {% endif %} -->
               <!-- If there are messages, create a script tag with an alert for the message -->
               {% with messages = get_flashed_messages() %}
-              <p>IN WITH</p>
+              <!-- <p>IN WITH</p> -->
                 {% if messages %}
-                <p>IN IF</p>
+                <!-- <p>IN IF</p> -->
                   {% for message in messages %}
-                  <p>IN FOR</p>
+                  <!-- <p>IN FOR</p> -->
                     <script>
                       alert(" {{ message|safe }} ")
                     </script>
@@ -209,4 +210,20 @@
         <input type="submit" value="Send">
     </form>
     <p><span id="setTempResult"></span></p> -->
+    
 {% endblock %}
+
+        
+
+{% block scripts %}
+        <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+        <script>
+          // mainFunc({{ current_user.is_authenticated }})
+          {% if current_user.is_authenticated %}
+            mainFunc(true);
+          {% else %}
+            mainFunc(false);
+          {% endif %}
+        </script>
+{% endblock scripts %}

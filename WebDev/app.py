@@ -1,21 +1,26 @@
 
 from os import name
-from flask import Flask, render_template, url_for, jsonify, request, redirect, flash #, url_for, request, redirect
+from flask import Flask, json, render_template, url_for, jsonify, request, redirect, flash #, url_for, request, redirect
 from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user
+from flask_login.utils import login_required
 from flask_sqlalchemy import SQLAlchemy
-# from flask_mysqldb import MySQL #FOR SOMEREASON THIS CAN'T WORK IN A FUNCTION WITH A MQTT DECORATOR
-import mysql.connector
+from flask_wtf import FlaskForm
 from flask_mqtt import Mqtt
+# from flask_mysqldb import MySQL #FOR SOMEREASON THIS CAN'T WORK IN A FUNCTION WITH A MQTT DECORATOR
 
+import mysql.connector
 from datetime import datetime
 import pandas as pd
-from werkzeug.security import generate_password_hash, check_password_hash
 
-from flask_wtf import FlaskForm
+from apscheduler.schedulers.background import BackgroundScheduler
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
+from werkzeug.security import generate_password_hash, check_password_hash
 # from Scheduler import Scheduler
 
+
+def test(temp):
+    print('Temp Set ' + str(temp))
 
 app = Flask(__name__)
 app.config.from_object('config.ProdConfig')
@@ -28,8 +33,17 @@ login_manager.init_app(app)
 mqtt = Mqtt(app)
 mqtt.subscribe("therm/DATA")
 
-# schd = Scheduler()
-# schd.setACertainHour(6, 23)
+sched = BackgroundScheduler()
+sched.add_jobstore('sqlalchemy', url=app.config['SQLALCHEMY_DATABASE_URI'])
+sched.start()
+
+
+    
+
+
+
+
+
 
 
 
@@ -85,7 +99,9 @@ def currentStatus():
     statusSet = {"setTemp" : result[0][3], "upstairsTemp" : result[0][2], "downstairsTemp" : "coming soon!", "furnaceStatus" : furnaceStatus, "date" : date, "time": time}
     return jsonify(statusSet)
 
+
 @app.route('/api/setTemp', methods=['POST'])
+@login_required
 def setTemp():
     #default user is root, but in future will be diferent (ie Guest, djohnjames, etc.)
     # userID = app.config['MYSQL_USER']
@@ -196,6 +212,83 @@ def historicalSetTemp():
     result = df.to_json(orient="records")
 
     return result
+
+def setNewTemp(newTemp):
+    userID = 7    
+    #Next need to send out this temp on a retained mqtt, then write the record into the database for later viewing
+    mqtt.publish('therm/TEMPSET', str(newTemp), qos=0, retain=True)
+    # The sql and params
+    sql = "INSERT INTO setTempLog (Date, Time, UserId, setTemp) VALUES (%s, %s, %s, %s)"
+    val = (datetime.now().strftime("%Y-%m-%d"), datetime.now().strftime("%H:%M:%S"), userID, newTemp)
+    # Connecting to db and inserting new data
+    myDb = mysql.connector.connect(host=app.config['MYSQL_HOST'],user=app.config['MYSQL_USER'],port=app.config['MYSQL_PORT'], password=app.config['MYSQL_PASSWORD'],database=app.config['MYSQL_DB'])
+    cursor = myDb.cursor()
+    cursor.execute(sql, val)
+    myDb.commit()
+    cursor.close()
+    
+
+
+# For testing:
+# sched.add_job(setNewTemp, 'cron', hour='14', minute='5', args=[20], id='1', replace_existing=True)
+# sched.add_job(setNewTemp, 'cron', hour='12', minute='29', args=[15], id='69', replace_existing=True)
+# sched.add_job(setNewTemp, 'cron', hour='12', minute='05', args=[15], id='morning', replace_existing=True)
+
+
+@app.route('/api/setScheduleTemp', methods=['POST'])
+def setScheduleTemp():
+    # adds scheduler job to call set temp function with specified temp
+    formData = request.form
+    # print(formData['scheduleTime'])
+    # print(formData['scheduleTime'][0:2])
+    # print(formData['scheduleTime'][3:6])
+    # print(formData['setTemp'])
+    
+    # Need some way of generating new ID's
+    # Keep generating random numbers 0-420 until we find one that is not currently in the job list
+    # In Future could flash an error if exception from adding an already exising job ID
+    sched.add_job(setNewTemp, 'cron', hour=formData['scheduleTime'][0:2], minute=formData['scheduleTime'][3:6], args=[formData["setTemp"]], id=formData["jobID"], replace_existing=True)
+    flash("New schedule element added successfully")
+    return redirect(url_for('schedule'))
+
+@app.route('/api/deleteScheduleTemp', methods=['POST'])
+def deleteScheduleTemp():
+    #remove schedule with given jobID that was sent
+    formData = request.form
+    if sched.get_job(formData['jobID']):
+        sched.remove_job(formData['jobID'])
+        flash("Schedule element successfully deleted!")
+        return redirect(url_for('schedule'))
+    else:
+        flash("That schedule element does not exist!")
+        return redirect(url_for('schedule'))
+
+@app.route('/api/viewSchedule', methods=['GET'])
+def viewScheduleTemp():
+    #return JSON with all scheduled jobs with ID and date/time, and temp values
+    result = {}
+    i= 0
+    for job in sched.get_jobs():
+        # print("name: %s, trigger: %s, next run: %s, handler: %s, kwargs: %s, " % (job.name, job.trigger, job.next_run_time, job.func, job.args[0]))
+        # print(job.id)
+        # print(job.trigger.__getstate__()['fields'])
+        # print(job.trigger.__getstate__()['fields'][4]) # the value of the field in the day of the week field
+        # print(job.trigger.__getstate__()['fields'][5]) # The value of the field in the hour column
+        # print(job.trigger.__getstate__()['fields'][6]) # value of field in the miniute column
+        
+        # need to convert the hour and minute fields to a datetime, then that to string to send
+        hour = str(job.trigger.__getstate__()['fields'][5])
+        jobID = job.id
+        setTemp = job.args[0]
+        if (int(str(job.trigger.__getstate__()['fields'][6])) < 10):
+            min = "0" + str(job.trigger.__getstate__()['fields'][6])
+        else:
+            min = str(job.trigger.__getstate__()['fields'][6])
+        result[i] = [hour + ":" + min, jobID, setTemp]
+        i = i+1
+        
+    # print(result)
+    return jsonify(result)
     
 
 class User(db.Model, UserMixin):
@@ -265,7 +358,8 @@ def login_post():
 @app.route('/logout')
 def logout():
     logout_user()
-    flash('You have been logged out successfully!')
+    print(current_user)
+    # flash('Thanks ' + current_user.name + ', you have been logged out successfully!')
     return redirect(url_for('index'))
 
 @login_manager.user_loader

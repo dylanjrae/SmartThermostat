@@ -41,10 +41,10 @@
               <!-- Tip 1: You can change the color of the sidebar using: data-color="blue | green | orange | red" -->
             <div class="sidebar-wrapper">
                 <div class="logo">
-                  <a href="javascript:void(0)" class="simple-text logo-mini">
+                  <a href="{{ url_for('index') }}" class="simple-text logo-mini">
                     NH
                   </a>
-                  <a href="javascript:void(0)" class="simple-text logo-normal">
+                  <a href="{{ url_for('index') }}" class="simple-text logo-normal">
                     Nuthouse
                   </a>
                 </div>
@@ -106,7 +106,7 @@
                         <span class="navbar-toggler-bar bar3"></span>
                       </button>
                     </div>
-                    <a class="navbar-brand" href="javascript:void(0)">Thermostat Dashboard</a>
+                    <a class="navbar-brand" href="/">Thermostat Dashboard</a>
                   </div>
                   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-bar navbar-kebab"></span>
@@ -214,8 +214,8 @@
                     <button id="cross">X</button>
                     <h3>Please log in to change settings.</h3>
                     <form action = "{{ url_for('login_post') }}" method="POST">
-                        <input type="text" placeholder="Email" class="txt" name="email"/>
-                        <input type="password" placeholder="Password" class="pswd" name="password"/>
+                        <input type="email" placeholder="Email" class="txt" name="email" required/>
+                        <input type="password" placeholder="Password" class="pswd" name="password" required/>
                         <label for="logbut">Remember me?</label>
                         <input type="checkbox" checked="checked" name="remember" id="logbut"/>
                         <!-- <input type="button" class="temp-button btn btn-primary btn-round"LogIn" id="btn"/> -->
@@ -279,20 +279,15 @@
         <!-- Main Control center, parallax effects, scripts for example pages, etc. -->
         <!-- The below three files should all be integrated together -->
         <script src="{{ url_for('static', filename='js/black-dashboard.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+        
         <script src="{{ url_for('static', filename='js/appearance.js') }}"></script>
 
-                <!-- call the function in main with a boolean for indicating if the user is logged in or not -->
-        <!-- <script defer async type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script> -->
-        <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
-        <script>
-          // mainFunc({{ current_user.is_authenticated }})
-          {% if current_user.is_authenticated %}
-            mainFunc(true);
-          {% else %}
-            mainFunc(false);
-          {% endif %}
-        </script>
+        {% block scripts %}
+        <!-- Space here for scripts unique to certain pages -->
+        {% endblock %}
+
+        
+        
 
     </body>
 </html>

@@ -16,7 +16,6 @@ $(document).ready(function() {
       fixed_plugin_open = $('.sidebar .sidebar-wrapper .nav li.active a p').html();
 
 
-
       // Login javascript overlay
       window.$("#logInBtn").click(function () {
         "use strict";
