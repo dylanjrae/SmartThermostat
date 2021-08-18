@@ -240,6 +240,7 @@ def setScheduleTemp():
     # print(formData['scheduleTime'][0:2])
     # print(formData['scheduleTime'][3:6])
     # print(formData['setTemp'])
+    # print(formData["remember"])
     
     # Need some way of generating new ID's
     # Keep generating random numbers 0-420 until we find one that is not currently in the job list
@@ -278,7 +279,7 @@ def viewScheduleTemp():
         jobID = job.id
         setTemp = job.args[0]
         remember = job.args[1]
-        print(remember)
+        # print(remember)
         if (int(str(job.trigger.__getstate__()['fields'][6])) < 10):
             min = "0" + str(job.trigger.__getstate__()['fields'][6])
         else:
@@ -376,7 +377,7 @@ def handle_connect(client, userdata, flags, rc):
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
-    # return
+    return
     message.payload = message.payload.decode("utf-8")
     # print("Received message '" + str(message.payload) + "' on topic '"
     #     + message.topic + "' with QoS " + str(message.qos))
