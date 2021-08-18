@@ -29,7 +29,7 @@ mqtt = Mqtt(app)
 mqtt.subscribe("therm/DATA")
 
 sched = BackgroundScheduler()
-sched.add_jobstore('sqlalchemy', url=app.config['SQLALCHEMY_DATABASE_URI'])
+sched.add_jobstore('sqlalchemy', url=app.config['SQLALCHEMY_DATABASE_URI'], pickle_protocol=4)
 sched.start()
 
 
