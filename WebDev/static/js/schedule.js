@@ -8,10 +8,6 @@ function mainFunc(isLoggedIn) {
             type: "GET",
             dataType: 'json',
             success: function(result){
-                //convert data to readable info
-                //display in a <p> at first
-                console.log(result);
-
                 for (const key in result) {
                     scheduleRecords.push(result[key])
                   }
@@ -19,15 +15,22 @@ function mainFunc(isLoggedIn) {
                 //   console.log(setTempRecords[1][3])
                 var trHTML = '';
                 $.each(scheduleRecords, function(i, o) {
+                    var preHeat;
+                    if(scheduleRecords[i][3] == 'on') {
+                        preHeat = 'Yes'
+                    }
+                    else {
+                        preHeat = 'No';
+                    }
+
                     trHTML += '<tr><td>' + scheduleRecords[i][0] +
                               '</td><td>' + scheduleRecords[i][2] +
+                              '</td><td>' + preHeat +
                               '</td><td class="alignRight">' + scheduleRecords[i][1] +
                               '</td></tr>';
                     // console.log(setTempRecords[i]);
                 });
                 $('#scheduleTable').append(trHTML);
-
-
             },
             error: function(error){
                 console.log('Error ${error}')

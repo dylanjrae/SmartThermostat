@@ -8,9 +8,9 @@
 <div class="content">
   <div class="row">
     <div class="col-lg-6 col-sm-12">
-      <div class="card card-chart">
+      <div class="card">
         <div class="card-header">
-          <div class="row">
+          <div class="row pl-3">
             <div class="col-lg-12 text-left">
               <h5 class="card-category">Temperature Schedule</h5>
               <h2 class="card-title">Set Schedule</h2>
@@ -18,39 +18,56 @@
           </div>
         </div>
         <div class="card-body">
-          <!-- Need to make a form to enter the time and temperature you want scheduled -->
-          <!-- Should take over the functionality of this with an ajax request and jquery to customie results before sending them out -->
-          <!-- Need to format better -->
-          <form id="setScheduleForm" action = "{{ url_for('setScheduleTemp') }}" method="GET">
-            <label for="scheduleTime">Time:</label>
-            <input type="time" id="scheduleTime" name="scheduleTime" required><br>
-            
-            <label for="scheduleTemp">Temperature:</label>
-            <input type="text" id="scheduleTemp" placeholder="Set Temperature"  name="setTemp" required/><br>
+          <!-- <div class='row align-items-center'> -->
+            <!-- <div class="col-lg-12"> -->
+              <form id="setScheduleForm" action = "{{ url_for('setScheduleTemp') }}" method="GET">
+                <div class="row pl-3">
+                  <label for="scheduleTime" class="col-sm-4 col-form-label">Time:</label>
+                  <div class="sol-sm-8">
+                    <input type="time" id="scheduleTime" name="scheduleTime" required>
+                  </div>
+                </div>
+                
+                <div class="row pl-3">
+                  <label for="scheduleTemp" class="col-sm-4 col-form-label">Temperature:</label>
+                  <div class="sol-sm-8">
+                    <input type="text" id="scheduleTemp" placeholder="Set Temperature"  name="setTemp" required/>
+                  </div>
+                </div>
 
-            <label for="jobID">Schedule ID:</label>
-            <input type="text" id="jobID" placeholder="Unique ID"  name="jobID" required/><br>
+                <div class="row pl-3">
+                  <label for="jobID" class="col-sm-4 col-form-label">Schedule ID:</label>
+                  <div class="sol-sm-8">
+                    <input type="text" id="jobID" placeholder="Unique ID"  name="jobID" required/>
+                  </div>
+                </div>
 
-            <label for="preheat">Preheat?</label>
-            <input type="checkbox" checked="checked" name="remember" id="preheat"/>
-            <!-- <input type="button" class="temp-button btn btn-primary btn-round"LogIn" id="btn"/> -->
-            <div class="row justify-conent-center">
-              <div class="col-lg-12">
-                <button type="submit" id="setScheduleBtn" class="login-button btn btn-primary btn-round">Set Schedule</button>
-              </div>
-            </div>
-            
-          </form>
+                <div class="row pl-3">
+                  <label for="preheat" class="col-sm-4 col-form-label">Preheat?</label>
+                  <div class="sol-sm-8">
+                    <input type="hidden" name="remember"/>
+                    <input class="form-check-input" type="checkbox" checked="checked" name="remember" id="preheat"/>
+                  </div>
+                </div>
+              
 
-
+                <div class="row pl-3">
+                  <div class="col-lg-12 text-center">
+                    <button type="submit" id="setScheduleBtn" class="btn btn-primary btn-round">Set Schedule</button>
+                  </div>
+                </div>
+                
+              </form>
+            <!-- </div> -->
+          <!-- </div> -->
         </div>
       </div>
     </div>
 
     <div class="col-lg-6 col-sm-12">
-      <div class="card card-chart">
+      <div class="card">
         <div class="card-header ">
-          <div class="row">
+          <div class="row pl-3">
             <div class="col-lg-12 text-left">
               <h5 class="card-category">Temperature Schedule</h5>
               <h2 class="card-title">Delete Schedule</h2>
@@ -60,13 +77,16 @@
         <div class="card-body">
           <form id="deleteScheduleForm" action = "{{ url_for('deleteScheduleTemp') }}" method="GET">
 
-            <label for="jobID">Schedule ID:</label>
-            <input type="text" id="jobID" placeholder="Unique ID"  name="jobID" required/><br>
+            <div class="row p-3">
+              <label for="removeJobID" class="col-sm-4 col-form-label">Schedule ID:</label>
+              <div class="sol-sm-8">
+                <input type="text" id="removeJobID" placeholder="Unique ID"  name="jobID" required/><br>
+              </div>
+            </div>
 
-            <!-- <input type="button" class="temp-button btn btn-primary btn-round"LogIn" id="btn"/> -->
-            <div class="row justify-conent-center">
-              <div class="col-lg-12">
-                <button type="submit" id="setScheduleBtn" class="login-button btn btn-primary btn-round">Delete Schedule</button>
+            <div class="row p-3">
+              <div class="col-lg-12 text-center">
+                <button type="submit" id="deleteScheduleBtn" class="btn btn-primary btn-round">Delete Schedule</button>
               </div>
             </div>
             
@@ -76,7 +96,7 @@
     </div>
 
     <div class="col-lg-12 col-sm-12">
-      <div class="card card-chart">
+      <div class="card">
         <div class="card-header ">
           <div class="row">
             <div class="col-lg-12 text-left">
@@ -94,7 +114,7 @@
                 <tr>
                   <th>Time</th>
                   <th>Set Temp</th>
-                  <!-- <th>Pre Heat</th> -->
+                  <th>Pre Heat</th>
                   <th class="alignRight">Schedule ID</th>
                 </tr>
               </thead>

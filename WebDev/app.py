@@ -16,11 +16,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
 from werkzeug.security import generate_password_hash, check_password_hash
-# from Scheduler import Scheduler
-
-
-def test(temp):
-    print('Temp Set ' + str(temp))
 
 app = Flask(__name__)
 app.config.from_object('config.ProdConfig')
@@ -213,7 +208,9 @@ def historicalSetTemp():
 
     return result
 
-def setNewTemp(newTemp):
+def setNewTemp(newTemp, preHeat):
+    # Logic to handle preheating
+    
     userID = 7    
     #Next need to send out this temp on a retained mqtt, then write the record into the database for later viewing
     mqtt.publish('therm/TEMPSET', str(newTemp), qos=0, retain=True)
@@ -247,7 +244,7 @@ def setScheduleTemp():
     # Need some way of generating new ID's
     # Keep generating random numbers 0-420 until we find one that is not currently in the job list
     # In Future could flash an error if exception from adding an already exising job ID
-    sched.add_job(setNewTemp, 'cron', hour=formData['scheduleTime'][0:2], minute=formData['scheduleTime'][3:6], args=[formData["setTemp"]], id=formData["jobID"], replace_existing=True)
+    sched.add_job(setNewTemp, 'cron', hour=formData['scheduleTime'][0:2], minute=formData['scheduleTime'][3:6], args=[formData["setTemp"], formData["remember"]], id=formData["jobID"], replace_existing=True)
     flash("New schedule element added successfully")
     return redirect(url_for('schedule'))
 
@@ -280,11 +277,13 @@ def viewScheduleTemp():
         hour = str(job.trigger.__getstate__()['fields'][5])
         jobID = job.id
         setTemp = job.args[0]
+        remember = job.args[1]
+        print(remember)
         if (int(str(job.trigger.__getstate__()['fields'][6])) < 10):
             min = "0" + str(job.trigger.__getstate__()['fields'][6])
         else:
             min = str(job.trigger.__getstate__()['fields'][6])
-        result[i] = [hour + ":" + min, jobID, setTemp]
+        result[i] = [hour + ":" + min, jobID, setTemp, remember]
         i = i+1
         
     # print(result)

@@ -179,20 +179,20 @@ $(document).ready(function() {
       }]
     };
 
-    var dataBarChart = {
-      labels: ['USA', 'GER', 'AUS', 'UK', 'RO', 'BR'],
-      datasets: [{
-        label: "Countries",
-        fill: true,
-        backgroundColor: gradientStroke,
-        hoverBackgroundColor: gradientStroke,
-        borderColor: '#1f8ef1',
-        borderWidth: 2,
-        borderDash: [],
-        borderDashOffset: 0.0,
-        data: [53, 20, 10, 80, 100, 45],
-      }]
-    };
+    // var dataBarChart = {
+    //   labels: ['USA', 'GER', 'AUS', 'UK', 'RO', 'BR'],
+    //   datasets: [{
+    //     label: "Countries",
+    //     fill: true,
+    //     backgroundColor: gradientStroke,
+    //     hoverBackgroundColor: gradientStroke,
+    //     borderColor: '#1f8ef1',
+    //     borderWidth: 2,
+    //     borderDash: [],
+    //     borderDashOffset: 0.0,
+    //     data: [53, 20, 10, 80, 100, 45],
+    //   }]
+    // };
 
 
     function prepareTwelveHourChart(ctx, settings) {
@@ -247,7 +247,7 @@ $(document).ready(function() {
       var dayLabels = ['-24hr', '-22hr', '-20hr', '-18hr', '-16hr', '-14hr', '-12hr', '-10hr', '-8hr', '-6hr', '-4hr', '-2hr'];
       var tempsWeek = [];
       var countsWeek = [];
-      var weekLabels = ['-7d', '-6d', '-5d', '-4d', '-3d', '-2d', '-1d'];
+      var weekLabels = ['-7d', '-6.5d', '-6d', '-5.5d', '-5d', '-4.5d', '-4d', '-3.5d', '-3d', '-2.5d', '-2d', '-1.5d', '-1d', '-0.5d'];
       var tempsMonth = [];
       var countsMonth = [];
       var monthLabels = ['-30', '-29', '-28', '-27', '-26', '-25', '-24', '-23', '-22', '-21', '-20', '-19', '-18', '-17', '-16', '-15', '-14', '-13', '-12', '-11', '-10', '-9', '-8', '-7', '-6', '-5', '-4', '-3', '-2', '-1'];
@@ -287,7 +287,7 @@ $(document).ready(function() {
           endDateTime = endDateTime.format('YYYY-MM-DD HH:mm:ss');
           startDateTime = startDateTime.format('YYYY-MM-DD HH:mm:ss'); 
           $.ajax({
-            url: '/api/historicalTemp?startDateTime='+ startDateTime + '&endDateTime=' + endDateTime + '&intervals=' + 7,
+            url: '/api/historicalTemp?startDateTime='+ startDateTime + '&endDateTime=' + endDateTime + '&intervals=' + 14,
             type: "GET",
             dataType: "json",
             success: function(result) {
@@ -303,7 +303,7 @@ $(document).ready(function() {
               var err = eval("(" + xhr.responseText + ")");
               console.log(err);
               console.log("Some data may be missing for 1 week, using default data.");
-              tempsWeek = [22, 24, 22, 26, 27, 23, 24];
+              tempsWeek = [22, 24, 22, 26, 27, 23, 24, 22, 24, 25, 24, 23, 22, 26];
             },
             complete: function() {
               endDateTime = dayjs();

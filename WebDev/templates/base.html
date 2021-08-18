@@ -48,44 +48,45 @@
                     Nuthouse
                   </a>
                 </div>
+
                 <ul class="nav">
-                  <li class="active ">
+                  <li class="nav-item active">
                     <a href="/">
                       <i class="fas fa-home"></i>
                       <p>Home</p>
                     </a>
                   </li>
-                  <li>
+                  <li class="nav-item">
                     <a href="{{ url_for('schedule') }}">
                       <i class="far fa-calendar"></i>
                       <p>Schedule</p>
                     </a>
                   </li>
-                  <li>
+                  <li class="nav-item">
                     <a href="{{ url_for('apiDetails') }}">
                       <i class="nucleo-icons icon-atom"></i>
                       <p>API Details</p>
                     </a>
                   </li>
-                  <li>
+                  <li class="nav-item">
                     <a href="#">
                       <i class="nucleo-icons icon-pin"></i>
                       <p>Help</p>
                     </a>
                   </li>
-                  <li>
+                  <li class="nav-item">
                     <a href="#">
                       <i class="nucleo-icons icon-bell-55"></i>
                       <p>Notifications</p>
                     </a>
                   </li>
-                  <li>
+                  <li class="nav-item">
                     <a href="#">
                       <i class="nucleo-icons icon-single-02"></i>
                       <p>User Profile</p>
                     </a>
                   </li>
-                  <li>
+                  <li class="nav-item">
                     <a href="#">
                       <i class="nucleo-icons icon-puzzle-10"></i>
                       <p>Store</p>
@@ -106,7 +107,7 @@
                         <span class="navbar-toggler-bar bar3"></span>
                       </button>
                     </div>
-                    <a class="navbar-brand" href="/">Thermostat Dashboard</a>
+                    <a class="navbar-brand" href="/">Smart Therm</a>
                   </div>
                   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-bar navbar-kebab"></span>
@@ -120,7 +121,8 @@
                           <span class="d-lg-none d-md-block">Search</span>
                         </button>
                       </li> -->
-                      <li class="dropdown nav-item">
+                      
+                      <!-- <li class="dropdown nav-item">
                         <a href="javascript:void(0)" class="dropdown-toggle nav-link" data-toggle="dropdown">
                           <div class="notification d-none d-lg-block d-xl-block"></div>
                           <i class="nucleo-icons icon-sound-wave"></i>
@@ -134,7 +136,7 @@
                           <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Guest updated the schedule</a></li>
                           <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Guest linked to google home</a></li>
                         </ul>
-                      </li>
+                      </li> -->
 
                       <li class="  ">
                         <div class="fixed-plugin">
@@ -219,7 +221,7 @@
                         <label for="logbut">Remember me?</label>
                         <input type="checkbox" checked="checked" name="remember" id="logbut"/>
                         <!-- <input type="button" class="temp-button btn btn-primary btn-round"LogIn" id="btn"/> -->
-                        <div class="row justify-conent-center">
+                        <div class="row justify-content-center">
                           <div class="col-lg-12">
                             <button type="submit" class="login-button btn btn-primary btn-round">Login</button>
                           </div>

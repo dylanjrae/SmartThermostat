@@ -58,6 +58,10 @@ var seq2 = 0,
 })();
 
 $(document).ready(function() {
+  //switches highlighted nav element
+  $('.nav-item.active').removeClass('active');
+  $('a[href="' + location.pathname + '"]').closest('li').addClass('active'); 
+
 
   var scroll_start = 0;
   var startchange = $('.row');
