@@ -71,6 +71,22 @@ def schedule():
 def apiDetails():
     return render_template('api-details.html')
 
+@app.route('/help')
+def help():
+    return render_template('help.html')
+
+@app.route('/user-profile')
+def userProfile():
+    return render_template('user-profile.html')
+
+@app.route('/notifications')
+def notifications():
+    return render_template('notifications.html')
+
+@app.route('/store')
+def store():
+    return render_template('store.html')
+
 @app.route('/api/currentStatus', methods=['GET'])
 def currentStatus():
     # Connecting to db and getting most recent record
