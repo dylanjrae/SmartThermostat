@@ -6,27 +6,42 @@
 
 {% block body %}
 <div class="content">
-    
-    <!-- temp trend graph -->
-    <div class="row">
-      <div class="col-12">
-        <div class="card card-chart">
-          <div class="card-header ">
-            <div class="row">
-              <div class="col-sm-6 text-left">
-                <h5 class="card-category">Notifications</h5>
-                <h2 class="card-title">Notifications Home</h2>
-              </div>
+  <div class="row">
+    <div class="col-12">
+      <div class="card card-chart">
+        <div class="card-header ">
+          <div class="row">
+            <div class="col-sm-6 text-left">
+              <h5 class="card-category">Notifications</h5>
+              <h2 class="card-title">Notifications Home</h2>
             </div>
           </div>
-          <div class="card-body">
-            <!-- Set up text notifications for temp change/alerts, post in table for set temperature records by user -->
-            
-            </div>
+        </div>
+        <div class="card-body">
+        <!-- Set up text notifications for big temp change/alerts-->
+          <div class="table-responsive">
+            <table class="table tablesorter">
+              <thead class=" text-primary">
+                <tr>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Name</th>
+                  <th class="text-center">Set Temperature</th>
+                </tr>
+              </thead>
+              <tbody id="setTempTable">
+              </tbody>
+            </table>
           </div>
+          <p>Stay tuned for text/email notifications for things like rapid temperature changes</p>
         </div>
       </div>
     </div>
   </div>
+</div>
 
 {% endblock %}
+
+{% block scripts %}
+        <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+{% endblock scripts %}

@@ -367,15 +367,16 @@ def login_post():
         return redirect('/')
     
     login_user(user, remember = form.remember_me.data)
-    flash('Login Successful!')
+    flash('Welcome ' + user.name + ', Login Successful!')
     return redirect(url_for('index'))
     # return render_template('login.html', title='Sign In', form=form)
 
 @app.route('/logout')
 def logout():
     logout_user()
-    print(current_user)
+    # print(current_user.name)
     # flash('Thanks ' + current_user.name + ', you have been logged out successfully!')
+    flash('You have been logged out successfully!')
     return redirect(url_for('index'))
 
 @login_manager.user_loader

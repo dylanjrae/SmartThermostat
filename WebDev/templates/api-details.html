@@ -14,19 +14,79 @@
           <div class="card-header ">
             <div class="row">
               <div class="col-sm-6 text-left">
-                <h5 class="card-category">API End Points</h5>
-                <h2 class="card-title">API Usage/Details Page Coming Soon!</h2>
+                <h5 class="card-category">API Details</h5>
+                <h2 class="card-title">API Usage/Endpoints</h2>
               </div>
             </div>
           </div>
-          <div class="card-body">
-            
+          <div class="pl-3 card-body">
+            <p>See below for all open endpoints that do not require a log in. At this time password protected endpoints are not supported.</p>
 
-            
-            </div>
           </div>
         </div>
       </div>
+
+      <div class="col-12">
+        <div class="card card-chart">
+          <div class="card-header ">
+            <div class="row">
+              <div class="col-sm-6 text-left">
+                <h5 class="card-category">API Details</h5>
+                <h2 class="card-title">/api/currentStatus</h2>
+              </div>
+            </div>
+          </div>
+          <div class="pl-3 card-body">
+            <p>Method: GET
+               Params: None
+               Returns: The most recent temperature record JSON in the following format: {JSON example}
+            </p>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="card card-chart">
+          <div class="card-header ">
+            <div class="row">
+              <div class="col-sm-6 text-left">
+                <h5 class="card-category">API Details</h5>
+                <h2 class="card-title">/api/historicalTemp</h2>
+              </div>
+            </div>
+          </div>
+          <div class="pl-3 card-body">
+            <p>Method: GET
+               Params: dateTimeStart (YYYY-MM-DD HH:MM:SS), dateTimeEnd(YYYY-MM-DD HH:MM:SS), intervals (integer)
+               Returns: Historical temperature data between the start and end dates is grouped based on the number of intervals specified, each group is averaged, and the data is returned in the following format: {JSON example}
+            </p>
+  
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="card card-chart">
+          <div class="card-header ">
+            <div class="row">
+              <div class="col-sm-6 text-left">
+                <h5 class="card-category">API Details</h5>
+                <h2 class="card-title">/api/historicalSetTemp</h2>
+              </div>
+            </div>
+          </div>
+          <div class="pl-3 card-body">
+            <p>Method: GET
+               Params: dateTimeStart (YYYY-MM-DD HH:MM:SS), dateTimeEnd(YYYY-MM-DD HH:MM:SS)
+               Returns: Historical set temperature data along with the name f the user who made the setting between the start and end dates specified is returned in the following format: {JSON example}
+            </p>
+
+          </div>
+        </div>
+      </div>
+
+
     </div>
   </div>
 

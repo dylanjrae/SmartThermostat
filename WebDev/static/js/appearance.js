@@ -96,9 +96,7 @@ $(document).ready(function() {
 
       $('.switch-change-color input').on("switchChange.bootstrapSwitch", function() {
         var $btn = $(this);
-
         if (white_color == true) {
-
           $('body').addClass('change-background');
           setTimeout(function() {
             $('body').removeClass('change-background');
@@ -106,7 +104,6 @@ $(document).ready(function() {
           }, 900);
           white_color = false;
         } else {
-
           $('body').addClass('change-background');
           setTimeout(function() {
             $('body').removeClass('change-background');
