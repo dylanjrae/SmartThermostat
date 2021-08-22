@@ -21,28 +21,28 @@
               <form id="setScheduleForm" action = "{{ url_for('setScheduleTemp') }}" method="GET">
                 <div class="row pl-3">
                   <label for="scheduleTime" class="col-sm-4 col-form-label">Time:</label>
-                  <div class="sol-sm-8">
+                  <div class="col-sm-8">
                     <input type="time" id="scheduleTime" name="scheduleTime" required>
                   </div>
                 </div>
                 
                 <div class="row pl-3">
                   <label for="scheduleTemp" class="col-sm-4 col-form-label">Temperature:</label>
-                  <div class="sol-sm-8">
+                  <div class="col-sm-8">
                     <input type="text" id="scheduleTemp" placeholder="Set Temperature"  name="setTemp" required/>
                   </div>
                 </div>
 
                 <div class="row pl-3">
                   <label for="jobID" class="col-sm-4 col-form-label">Schedule ID:</label>
-                  <div class="sol-sm-8">
+                  <div class="col-sm-8">
                     <input type="text" id="jobID" placeholder="Unique ID"  name="jobID" required/>
                   </div>
                 </div>
 
                 <div class="row pl-3">
                   <label for="preheat" class="col-sm-4 col-form-label">Preheat?</label>
-                  <div class="sol-sm-8">
+                  <div class="col-sm-8">
                     <input class="form-check-input" type="checkbox" checked="checked" name="remember" id="preheat" value="on"/>
                     <input type="hidden" name="remember"/>
                   </div>
@@ -74,7 +74,7 @@
 
             <div class="row p-3">
               <label for="removeJobID" class="col-sm-4 col-form-label">Schedule ID:</label>
-              <div class="sol-sm-8">
+              <div class="col-sm-8">
                 <input type="text" id="removeJobID" placeholder="Unique ID"  name="jobID" required/><br>
               </div>
             </div>

@@ -20,7 +20,8 @@
             </div>
           </div>
           <div class="pl-3 card-body">
-            <p>See below for all open endpoints that do not require a log in. At this time password protected endpoints are not supported.</p>
+            <p>See below for all open endpoints that do not require a log in. At this time password protected endpoints 
+              (set temperature modifications and schedule changes) are not supported.</p>
 
           </div>
         </div>
@@ -36,12 +37,34 @@
               </div>
             </div>
           </div>
-          <div class="pl-3 card-body">
-            <p>Method: GET
-               Params: None
-               Returns: The most recent temperature record JSON in the following format: {JSON example}
-            </p>
+          <div class="row pl-3 card-body">
+            <div class="col-sm-2">
+              <p><strong>Method:</strong></p>
+            </div>
+            <div class="col-sm-10">
+              <p>GET</p>
+            </div>
 
+            <div class="col-sm-2">
+              <p><strong>Params:</strong></p>
+            </div>
+            <div class="col-sm-10">
+              <p>None</p>
+            </div>
+
+            <div class="col-sm-2">
+              <p><strong>Returns:</strong></p>
+            </div>
+            <div class="col-sm-10">
+              <p>The most recent temperature record in the following JSON format: <br> <em>{
+                "date": "Aug 22, 2021", <br>
+                "downstairsTemp": 22.4, <br>
+                "furnaceStatus": "OFF", <br>
+                "setTemp": 21.0, <br>
+                "time": "11:36:16", <br>
+                "upstairsTemp": 21.56
+              }</em></p>
+            </div>
           </div>
         </div>
       </div>
@@ -56,12 +79,36 @@
               </div>
             </div>
           </div>
-          <div class="pl-3 card-body">
-            <p>Method: GET
-               Params: dateTimeStart (YYYY-MM-DD HH:MM:SS), dateTimeEnd(YYYY-MM-DD HH:MM:SS), intervals (integer)
-               Returns: Historical temperature data between the start and end dates is grouped based on the number of intervals specified, each group is averaged, and the data is returned in the following format: {JSON example}
-            </p>
-  
+          <div class="row pl-3 card-body">
+            <div class="col-sm-2">
+              <p><strong>Method:</strong></p>
+            </div>
+            <div class="col-sm-10">
+              <p>GET</p>
+            </div>
+
+            <div class="col-sm-2">
+              <p><strong>Params:</strong></p>
+            </div>
+            <div class="col-sm-10">
+              <p>startDateTime <em>(YYYY-MM-DD HH:MM:SS)</em>, endDateTime <em>(YYYY-MM-DD HH:MM:SS)</em>, intervals <em>(integer)</em></p>
+            </div>
+
+            <div class="col-sm-2">
+              <p><strong>Returns:</strong></p>
+            </div>
+            <div class="col-sm-10">
+              <p>Historical temperature data between the start and end dates is grouped into the number of intervals specified, 
+                each group is averaged, and the computed data is returned along with the number of data points that were in each interval. The most recent data point is index "0". The following example URL returns data in JSON format: <br><br>
+                /api/historicalTemp?startDateTime=2021-08-21%2011:50:00&endDateTime=2021-08-22%2011:50:00&intervals=6<br><br> <em>{
+                  "0": [22.30414448669201, 1052], <br>
+                  "1": [22.346821256038645, 1035], <br>
+                  "2": [21.801839847473786, 1049], <br>
+                  "3": [21.254807302231235, 986], <br>
+                  "4": [21.639048442906574, 1156], <br>
+                  "5": [21.47720187793427, 1065]
+                }</em></p>
+            </div>
           </div>
         </div>
       </div>
@@ -76,12 +123,32 @@
               </div>
             </div>
           </div>
-          <div class="pl-3 card-body">
-            <p>Method: GET
-               Params: dateTimeStart (YYYY-MM-DD HH:MM:SS), dateTimeEnd(YYYY-MM-DD HH:MM:SS)
-               Returns: Historical set temperature data along with the name f the user who made the setting between the start and end dates specified is returned in the following format: {JSON example}
-            </p>
+          <div class="row pl-3 card-body">
+            <div class="col-sm-2">
+              <p><strong>Method:</strong></p>
+            </div>
+            <div class="col-sm-10">
+              <p>GET</p>
+            </div>
 
+            <div class="col-sm-2">
+              <p><strong>Params:</strong></p>
+            </div>
+            <div class="col-sm-10">
+              <p>startDateTime <em>(YYYY-MM-DD HH:MM:SS)</em>, endDateTime <em>(YYYY-MM-DD HH:MM:SS)</em></p>
+            </div>
+
+            <div class="col-sm-2">
+              <p><strong>Returns:</strong></p>
+            </div>
+            <div class="col-sm-10">
+              <p>Historical set temperature data along with the name of the user who made the setting between the start and end dates specified. The following example URL returns data in JSON format: <br><br>
+                /api/historicalSetTemp?startDateTime=2021-08-21%2011:50:00&endDateTime=2021-08-22%2011:50:00<br><br> <em>[
+                  {"0": "2021-08-22", "1": "08:14:42", "2": "Dylan", "3": 21.0},<br>
+                  {"0": "2021-08-22", "1": "06:00:00", "2": "Scheduler", "3": 22.5},<br>
+                  {"0": "2021-08-21", "1": "21:45:00", "2": "Scheduler", "3": 18.0},<br>
+                  {"0": "2021-08-21", "1": "13:44:57", "2": "Dylan", "3": 21.0} ]</em></p>
+            </div>
           </div>
         </div>
       </div>

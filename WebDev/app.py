@@ -33,31 +33,6 @@ sched.add_jobstore('sqlalchemy', url=app.config['SQLALCHEMY_DATABASE_URI'], pick
 sched.start()
 
 
-    
-
-
-
-
-
-
-
-
-
-
-
-# TO DO
-#  1. DONE Integrate mqtt controller with flask
-#     Organize based on this guide: https://exploreflask.com/en/latest/organizing.html
-#  2. Add scheduler functionality Aidan made (should be stored in database not a dict)
-#  3. DONE Add set temperature functionality to webpage
-#  4. Apply css and bootstrap formating
-#  5. Graphs of temperature over time with outside weather data
-#  6. Should have users for API/database login
-#  7. Add google home functionality (what is temp and set temp)
-#  8. Clean up css code and all files in general
-
-# Get socket working for test
-# then try and see if it works on apache to trrouble shoot
 @app.route('/')
 def index():
     # flash('Welcome!')

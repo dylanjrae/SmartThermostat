@@ -1,5 +1,3 @@
-
-
 //define options for each chart
 //get chart elements for each chart
 // apply chart specific formatting to each chart
@@ -415,7 +413,4 @@ $(document).ready(function() {
                               data: dataHistorical,
                               options: gradientChartOptionsConfigurationWithTooltipPurple
                             });
-
-
-    // generateSetTempHistoryChart();
 });
