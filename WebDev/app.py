@@ -18,7 +18,7 @@ from wtforms.validators import DataRequired
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.config.from_object('config.DevConfig')
+app.config.from_object('config.ProdConfig')
 
 db = SQLAlchemy(app)
 
@@ -371,7 +371,7 @@ def handle_connect(client, userdata, flags, rc):
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
-    return
+    # return
     message.payload = message.payload.decode("utf-8")
     # print("Received message '" + str(message.payload) + "' on topic '"
     #     + message.topic + "' with QoS " + str(message.qos))
