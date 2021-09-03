@@ -18,7 +18,7 @@ from wtforms.validators import DataRequired
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.config.from_object('config.ProdConfig')
+app.config.from_object('config.DevConfig')
 
 db = SQLAlchemy(app)
 
@@ -52,6 +52,8 @@ def help():
 
 @app.route('/user-profile')
 def userProfile():
+    #Need to return user profile info (date created, name, email)
+    #Either will do that in html or pass variable when render_template is called. Guessing will be better to do directly in html jinja call
     return render_template('user-profile.html')
 
 @app.route('/notifications')
@@ -369,7 +371,7 @@ def handle_connect(client, userdata, flags, rc):
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
-    # return
+    return
     message.payload = message.payload.decode("utf-8")
     # print("Received message '" + str(message.payload) + "' on topic '"
     #     + message.topic + "' with QoS " + str(message.qos))

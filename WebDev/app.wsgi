@@ -1,4 +1,5 @@
 #! /usr/bin/python 3.7
+#get venv working
 
 import logging
 import sys
