@@ -1,4 +1,4 @@
-#! /usr/bin/python 3.7
+
 
 import logging
 import sys
