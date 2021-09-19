@@ -64,10 +64,14 @@ def notifications():
 def store():
     return render_template('store.html')
 
+# currently selecting most recent data record
+# CHANGE: Query based on current userID and get HOMEID, then from home get main device ID
+# Then should retrive most recent record for that specific deviceID
+# Include paramter for specific deviceID
 @app.route('/api/currentStatus', methods=['GET'])
 def currentStatus():
     # Connecting to db and getting most recent record
-    sql = "SELECT * FROM `thermData` ORDER BY `thermData`.`Date` DESC, `thermData`.`Time` DESC LIMIT 1"
+    sql = "SELECT Date, Time, currentTemp, setTemp, heating, battery FROM thermData WHERE thermData.deviceID=0 ORDER BY `thermData`.`Date` DESC, `thermData`.`Time` DESC LIMIT 1"
 
     myDb = mysql.connector.connect(host=app.config['MYSQL_HOST'],user=app.config['MYSQL_USER'],port=app.config['MYSQL_PORT'], password=app.config['MYSQL_PASSWORD'],database=app.config['MYSQL_DB'])
     cursor = myDb.cursor()
@@ -87,7 +91,7 @@ def currentStatus():
     statusSet = {"setTemp" : result[0][3], "upstairsTemp" : result[0][2], "downstairsTemp" : "coming soon!", "furnaceStatus" : furnaceStatus, "date" : date, "time": time}
     return jsonify(statusSet)
 
-
+# change to include parameter for specfic homeID
 @app.route('/api/setTemp', methods=['POST'])
 @login_required
 def setTemp():
@@ -125,6 +129,8 @@ def setTemp():
 # returns averaged temps for number of points specified from past (0) to present (intervals-1)
 
 # Should enforce paramter name/type
+# Currently does it for device ID=0"master ntuthouse therm"
+# CHANGE to include parameter for deviceID
 @app.route('/api/historicalTemp', methods=['GET'])
 def historicalTemp():
     # recevies time stamps for desired interval
@@ -137,7 +143,7 @@ def historicalTemp():
     dateTimeEnd = args["endDateTime"]
     intervalCount = int(args["intervals"])
     
-    sql = "SELECT thermData.Date, thermData.Time, thermData.currentTemp FROM thermData WHERE TIMESTAMP(thermData.Date, thermData.Time) >= '" +dateTimeStart+ "' AND TIMESTAMP(`Date`, `Time`) <= '" + dateTimeEnd + "' ORDER BY thermData.Date DESC, thermData.Time DESC"
+    sql = "SELECT thermData.Date, thermData.Time, thermData.currentTemp FROM thermData WHERE thermData.deviceID=0 AND TIMESTAMP(thermData.Date, thermData.Time) >= '" +dateTimeStart+ "' AND TIMESTAMP(`Date`, `Time`) <= '" + dateTimeEnd + "' ORDER BY thermData.Date DESC, thermData.Time DESC"
 
     myDb = mysql.connector.connect(host=app.config['MYSQL_HOST'],user=app.config['MYSQL_USER'],port=app.config['MYSQL_PORT'], password=app.config['MYSQL_PASSWORD'],database=app.config['MYSQL_DB'])
     cursor = myDb.cursor()
@@ -178,6 +184,7 @@ def historicalTemp():
 # returns records of all set temps within specified date range
 
 # Should enforce paramter name/type
+# Should add a parameter for set temps for a specfic homeID (look up only set temps for userID's in a given house)
 @app.route('/api/historicalSetTemp', methods=['GET'])
 def historicalSetTemp():  
     args = request.args
@@ -201,6 +208,7 @@ def historicalSetTemp():
 
     return result
 
+# needs to be for a specific home id 
 def setNewTemp(newTemp, preHeat):
     # Logic to handle preheating
     
@@ -224,7 +232,7 @@ def setNewTemp(newTemp, preHeat):
 # sched.add_job(setNewTemp, 'cron', hour='12', minute='29', args=[15], id='69', replace_existing=True)
 # sched.add_job(setNewTemp, 'cron', hour='12', minute='05', args=[15], id='morning', replace_existing=True)
 
-
+# needs to be for a specific home
 @app.route('/api/setScheduleTemp', methods=['POST'])
 def setScheduleTemp():
     # adds scheduler job to call set temp function with specified temp
@@ -254,6 +262,7 @@ def deleteScheduleTemp():
         flash("That schedule element does not exist!")
         return redirect(url_for('schedule'))
 
+# schedules should be done by home
 @app.route('/api/viewSchedule', methods=['GET'])
 def viewScheduleTemp():
     #return JSON with all scheduled jobs with ID and date/time, and temp values
@@ -297,6 +306,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(100), unique=True)
     name = db.Column(db.String(50))
     password_hash = db.Column(db.String(255))
+    homeID = db.Column(db.Integer)
     
     def set_password(self,password):
         self.password_hash = generate_password_hash(password)
@@ -365,7 +375,7 @@ def load_user(user_id):
 
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
-    mqtt.subscribe("therm/DATA") #FOR SOME REASON THIS IS NOT BEING EXECUTED, probably a problem with the shit flask mqtt
+    mqtt.subscribe("therm/DATA")
     print("Connected with result code "+str(rc))
     
 
@@ -377,18 +387,18 @@ def handle_mqtt_message(client, userdata, message):
     #     + message.topic + "' with QoS " + str(message.qos))
     if message.topic == "therm/DATA":
         # The sql and params
-        sql = "INSERT INTO thermData (Date, Time, currentTemp, setTemp, heating, battery) VALUES (%s, %s, %s, %s, %s, %s)"
-        val = (datetime.now().strftime("%Y-%m-%d"), datetime.now().strftime("%H:%M:%S"), message.payload.split("/")[0], message.payload.split("/")[1], message.payload.split("/")[2], message.payload.split("/")[3])
-        print("Inserting: " + message.payload.split("/")[0] + "/" + message.payload.split("/")[1] + "/" + message.payload.split("/")[2] + "/" + message.payload.split("/")[3])
+        sql = "INSERT INTO thermData (deviceID, Date, Time, currentTemp, setTemp, heating, battery) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        val = (message.payload.split("/")[0], datetime.now().strftime("%Y-%m-%d"), datetime.now().strftime("%H:%M:%S"), message.payload.split("/")[1], message.payload.split("/")[2], message.payload.split("/")[3], message.payload.split("/")[4])
+        print("Inserting: " + message.payload.split("/")[0] + "/" + message.payload.split("/")[1] + "/" + message.payload.split("/")[2] + "/" + message.payload.split("/")[3] + "/" + message.payload.split("/")[4])
 
         # Connecting to db and inserting new data
         myDb = mysql.connector.connect(host=app.config['MYSQL_HOST'],user=app.config['MYSQL_USER'],port=app.config['MYSQL_PORT'], password=app.config['MYSQL_PASSWORD'],database=app.config['MYSQL_DB'])
         cursor = myDb.cursor()
-        # sql = "INSERT INTO thermData (Date, Time, currentTemp, setTemp, heating, battery) VALUES (%s, %s, %s, %s, %s, %s)"
-        # val = (datetime.now().strftime("%Y-%m-%d"), datetime.now().strftime("%H:%M:%S"), 69.69, 69.69, 69.69, 69.69)
+
         cursor.execute(sql, val)
         myDb.commit()
         cursor.close()
+        
 
 
 

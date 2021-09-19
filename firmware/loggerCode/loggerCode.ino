@@ -8,7 +8,7 @@
 //#include <ESP8266WebServer.h>
 
 #ifndef STASSID
-#define DEVICEID 0
+#define DEVICEID 1
 #define STASSID "NUTHOUSE_2.4"
 #define STAPSK  "pmwpmwpmw"
 #define MQTTHOST "10.0.0.69"
@@ -26,7 +26,7 @@
 } rtcData;
 
 //Static IP
-IPAddress ip(10, 0, 0, 96);
+IPAddress ip(10, 0, 0, 97);
 IPAddress gateway(10, 0, 0, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress dns(64, 59, 135, 148); //64, 59, 135, 148

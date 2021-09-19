@@ -8,7 +8,6 @@
 //#include <ESP8266WebServer.h>
 
 #ifndef STASSID
-#define DEVICEID 0
 #define STASSID "NUTHOUSE_2.4"
 #define STAPSK  "pmwpmwpmw"
 #define MQTTHOST "10.0.0.69"
@@ -26,7 +25,7 @@
 } rtcData;
 
 //Static IP
-IPAddress ip(10, 0, 0, 96);
+IPAddress ip(10, 0, 0, 97);
 IPAddress gateway(10, 0, 0, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress dns(64, 59, 135, 148); //64, 59, 135, 148
@@ -185,31 +184,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
 }
 
-//void connectWifi() {
-//    WiFi.begin(ssid, password);
-//    Serial.print("Connecting to WiFi Network: ");
-//    Serial.print(ssid);
-//    Serial.println(" ...");
-//
-//    int i = 0;
-//    while (WiFi.status() != WL_CONNECTED) {
-//      delay(1000);
-//      Serial.print(++i); Serial.print(' ');
-//      //light blinks every other second when connecting then goes hard on after connecting
-//      if (i % 2 == 1) {
-//        digitalWrite(led, HIGH);
-//      }
-//      else {
-//        digitalWrite(led, LOW);
-//      }
-//    }
-//    digitalWrite(led, LOW);
-//      
-//    Serial.println("\n");
-//    Serial.print("Connection established in "); Serial.print(i); Serial.println(" seconds!");
-//    Serial.print("IP address: ");
-//    Serial.println(WiFi.localIP());
-// }
+
+
 void connectWiFi() {
     WiFi.forceSleepWake();
     delay(1);
@@ -278,7 +254,7 @@ void connectWiFi() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-//   Write current connection info back to RTC
+  //   Write current connection info back to RTC
   rtcData.channel = WiFi.channel();
   memcpy( rtcData.ap_mac, WiFi.BSSID(), 6 ); // Copy 6 bytes of BSSID (AP's MAC address)
   rtcData.crc32 = calculateCRC32( ((uint8_t*)&rtcData) + 4, sizeof(rtcData) - 4 );
@@ -288,7 +264,7 @@ void connectWiFi() {
 
 void reconnectMQTT() {
 //  Serial.println("reconnect MQTT called");
-  String clientID = "ESP8266Client";
+  String clientID = "ESP8266Client_Basement";
 //  clientID += String(random(0xffff), HEX);
   while (!client.connected()) {
     if (client.connect(clientID.c_str(), mqttUser, mqttPassword, willTopic, willQoS, willRetain, willMessage)) {
@@ -310,7 +286,7 @@ void sendDataRecord() {
   if(!client.connected()) {
     reconnectMQTT();
   }
-  String toSend = String(DEVICEID) + "/" + String(currentTemp) + "/" + String(setTemp) + "/" + String(heating) + "/" + String(batt);
+  String toSend = String(currentTemp) + "/" + String(setTemp) + "/" + String(heating) + "/" + String(batt);
   const char* toSendChar = toSend.c_str();
   client.publish("therm/DATA", toSendChar);
   Serial.println("Data record sent!");
@@ -407,6 +383,7 @@ void loop() {
   checkHeating(); //if we dont need to heat should shut off wifi and only check every DEEPSLEEPTIME interval
   measureTemp();
   sendDataRecord();
+//  Serial.println(currentTemp);
 
   if(!heating && !overrideIO) {
     sendMQTTmessage("therm/main", "Entering a deep sleep");
