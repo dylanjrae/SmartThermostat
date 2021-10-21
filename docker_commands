@@ -1,0 +1,7 @@
+Run mosquitto container: sudo docker run -d -p 1883:1883 --name mqttbroker -v /home/pi/SmartThermostat/mosquitto.conf:/mosquitto/config/mosquitto.config eclipse-mosquitto
+
+List running containers: sudo docker container List
+
+General info: sudo docker info
+
+Kill container: sudo docker kill [name]
