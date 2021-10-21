@@ -13,7 +13,7 @@
 #define STAPSK  "pmwpmwpmw"
 #define MQTTHOST "10.0.0.69"
 #define MQTTPORT 1883
-#define SLEEPTIME 10e6 //10 secs
+#define SLEEPTIME 30e6 //30 secs
 #define SETTEMP 15
 #endif
 
