@@ -1,9 +1,29 @@
-Run mosquitto container: sudo docker run -d -p 1883:1883 --name mqttbroker -v /home/pi/SmartThermostat/mosquitto.conf:/mosquitto/config/mosquitto.config eclipse-mosquitto
-
-sudo docker run -p 1883:1883 --name mqttbroker -v /home/pi/SmartThermostat/mosquitto.conf:/mosquitto/config/mosquitto.config eclipse-mosquitto
-
+GENERAL
 List running containers: sudo docker container List
 
 General info: sudo docker info
 
 Kill container: sudo docker kill [name]
+
+PORTTAINER
+Create portainer: sudo docker volume create portainer_data
+
+Run portainer: sudo docker run -d -p 8000:8000 -p 9443:9443 --name portainer \
+    --restart=always \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v portainer_data:/data \
+    portainer/portainer-ce:latest
+
+
+MQTT BROKER
+Run mosquitto container: sudo docker run -d -p 1883:1883 --name mqttbroker -v /home/pi/SmartThermostat/mosquitto.conf:/mosquitto/config/mosquitto.conf eclipse-mosquitto
+
+Run mosquitto container with text: sudo docker run -p 1883:1883 --name mqttbroker -v /home/pi/SmartThermostat/mosquitto.conf:/mosquitto/config/mosquitto.conf eclipse-mosquitto
+
+sudo docker run -p 1883:1883 --name mqttbroker -v $PWD/mosquitto.conf:/etc/mosquitto/conf.d/ eclipse-mosquitto
+
+MYSQL
+Run mysql container: sudo docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=pmwpmwpmw -d hypriot/rpi-mysql:latest --ssl=0
+
+
+APACHE+FLASK

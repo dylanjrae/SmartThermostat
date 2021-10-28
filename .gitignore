@@ -2,3 +2,4 @@
 .venv/
 serverBackup.img
 token.txt
+certificate/

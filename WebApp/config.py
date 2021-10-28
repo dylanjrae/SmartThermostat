@@ -9,7 +9,7 @@ class Config:
     SECRET_KEY = 'verySecretKey'
     
     # Datebase
-    MYSQL_HOST = '10.0.0.69'
+    MYSQL_HOST = '10.0.0.101'
     MYSQL_USER = 'root'
     MYSQL_PASSWORD = 'pmwpmwpmw'
     MYSQL_DB = 'tempLog'
@@ -17,12 +17,12 @@ class Config:
     # MYSQL_CURSORCLASS = ''
     
     # SQLAlchemy
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:pmwpmwpmw@10.0.0.69/tempLog'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:pmwpmwpmw@10.0.0.101/tempLog'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # MQTT
     MQTT_CLIENT_ID = "WebApp"
-    MQTT_BROKER_URL = '10.0.0.69'
+    MQTT_BROKER_URL = '10.0.0.101'
     MQTT_BROKER_PORT = 1883    
     MQTT_USERNAME = ''
     MQTT_PASSWORD = ''
