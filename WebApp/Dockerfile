@@ -40,9 +40,11 @@ RUN a2ensite apache-flask.conf
 RUN ln -sf /proc/self/fd/1 /var/log/apache2/access.log && \
     ln -sf /proc/self/fd/1 /var/log/apache2/error.log
 
-# Expose ports for http(80) and https(443), (make sure ports are open on router!)
-EXPOSE 80
-EXPOSE 443
+# Expose ports for http(80), https(443), sql(3306), and mqtt(1883). (make sure ports are open on router!)
+EXPOSE 80 
+EXPOSE 443 
+EXPOSE 3306 
+EXPOSE 1883
 
 # Set the working directory
 WORKDIR /var/www/apache-flask
