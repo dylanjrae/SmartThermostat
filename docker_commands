@@ -27,3 +27,6 @@ Run mysql container: sudo docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PAS
 
 
 APACHE+FLASK
+Buiild an image: sudo docker build --tag apache-flask .
+Run the container: sudo docker run --name apache-flask -p 80:80 -p 443:443 apache-flask
+# sudo docker run --name apache-flask -p 80:80 -p 443:443 -p 3306:3306 -p 1883:1883 apache-flask

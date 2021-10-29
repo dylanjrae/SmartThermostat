@@ -1,4 +1,3 @@
-
 from os import name
 from flask import Flask, json, render_template, url_for, jsonify, request, redirect, flash #, url_for, request, redirect
 from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user
