@@ -11,9 +11,9 @@
 #define DEVICEID 1
 #define STASSID "NUTHOUSE_2.4"
 #define STAPSK  "pmwpmwpmw"
-#define MQTTHOST "10.0.0.69"
+#define MQTTHOST "10.0.0.101"
 #define MQTTPORT 1883
-#define SLEEPTIME 10e6 //10 secs
+#define SLEEPTIME 30e6 //10 secs
 #define SETTEMP 15
 #endif
 
