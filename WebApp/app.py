@@ -377,7 +377,7 @@ def handle_connect(client, userdata, flags, rc):
     mqtt.subscribe("therm/DATA")
     print("Connected with result code "+str(rc))
     
-
+# Should do some preprocessing to not accept impossible values
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
     # return

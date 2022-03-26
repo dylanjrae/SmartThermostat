@@ -1,5 +1,6 @@
 #include <PubSubClient.h>
 #include <ESP8266WiFi.h>
+#include "credentials.h"
 //#include <WiFiClient.h>
 //#include <ArduinoOTA.h>
 //#include <WiFiUdp.h>
@@ -7,10 +8,8 @@
 //#include <ESP8266mDNS.h>
 //#include <ESP8266WebServer.h>
 
-#ifndef STASSID
+#ifndef MQTTHOST
 #define DEVICEID 0
-#define STASSID "NUTHOUSE_2.4"
-#define STAPSK  "pmwpmwpmw"
 #define MQTTHOST "10.0.0.101"
 #define MQTTPORT 1883
 #define SLEEPTIME 30e6 //30 secs
