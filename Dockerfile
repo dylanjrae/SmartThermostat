@@ -13,8 +13,7 @@ RUN apt-get update && apt-get install -y apache2 \
 && apt-get autoremove \
 && rm -rf /var/lib/apt/lists/*
 
-# Python package management and basic dependencies
-# RUN apt-get install -y python3.7 python3.7-dev python3.7-pip
+
 
 # Register the version in alternatives
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
@@ -66,6 +65,9 @@ EXPOSE 1883
 
 # Set the working directory
 WORKDIR /var/www/apache-flask
+
+# Set the timezone
+ENV TZ="America/Edmonton"
 
 # Start apache in foreground
 CMD /usr/sbin/apache2ctl -D FOREGROUND
